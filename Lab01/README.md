@@ -393,6 +393,24 @@ These commands are used to build, manage dependencies, and run various phases of
 
 These commands will help you manage your Maven projects efficiently, from compiling to deploying, and checking dependencies.
 
+
+
+# .gitignore
+
+Specifies intentionally untracked files to ignore
+
+
+## Pattern format
+
+See [here](https://git-scm.com/docs/gitignore).  
+See [here](https://github.com/github/gitignore) gitignore templates.  
+Use this [.gitignore file](https://gist.github.com/bastiao/6b07c238e8d1ed4c7ff3e197660b6c5e).
+
+
+
+
+
+
 # Notes
 
 Compile and run the project, either from the IDE or the CLI:
@@ -406,3 +424,6 @@ mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" # adapt to 
 ```xml 
     mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" -Dexec.args="arg0 arg1 arg2" 
 ```
+
+
+
