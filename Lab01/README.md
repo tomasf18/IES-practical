@@ -408,6 +408,24 @@ Use this [.gitignore file](https://gist.github.com/bastiao/6b07c238e8d1ed4c7ff3e
 
 
 
+# Standard Directory Layout
+
+Having a common directory layout allows users familiar with one Maven project to immediately feel at home in another Maven project.  
+If I'm used to work in Maven projects, this standard layout will help me immediately locate the files I wish if I were indicated to work 
+on a unkown Maven project. It's not a rule, it is a standard for project organization.  
+
+I can see the section that documents the directory layout `expected` by Maven and the directory layout `created` by Maven [here](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html).  
+
+One of the standards is `src/main/resources` for Application/Library resources. And it was needed in the exercise 1.3.
+Here, I was able to store the configuration file for logging support, `log4j2.xml`.
+
+
+
+# File logging integration
+
+To add this new feature, I used the recommended logging library `Log4j2`.  
+I had to add its dependencies to the `pom file` (the links provided have all the info), and also to create the logging configuration file `log4j2.xml`.  
+Guess where this last file had to be located? Yup, `src/main/resources`!
 
 
 

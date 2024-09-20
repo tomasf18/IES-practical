@@ -4,13 +4,19 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 
 /**
  * demonstrates the use of the IPMA API for weather forecast
  */
 public class WeatherStarter {
+
+    private static final Logger logger = LogManager.getLogger(WeatherStarter.class);
 
     public static void  main(String[] args ) {
 
@@ -34,8 +40,15 @@ public class WeatherStarter {
             if (forecast != null) {
                 List<CityForecast> forecastData = forecast.getData();
                 if (!forecastData.isEmpty()) {
+                    logger.info("Weather forecast for {}, {}", forecast.getGlobalIdLocal(), forecast.getCountry());
                     System.out.printf("Weather forecast for %s, %s%n", forecast.getGlobalIdLocal(), forecast.getCountry());
                     for (CityForecast dayForecast : forecastData) {
+                        logger.info("Date: {}", dayForecast.getForecastDate());
+                        logger.info("Max Temperature: {}°C", dayForecast.getTMax());
+                        logger.info("Min Temperature: {}°C", dayForecast.getTMin());
+                        logger.info("Weather Type: {}", dayForecast.getPredWindDir());
+                        logger.info("Wind Direction: {}", dayForecast.getPredWindDir());
+                        logger.info("Wind Speed: {} km/h", dayForecast.getClassWindSpeed());
                         System.out.printf("%nDate: %s%n", dayForecast.getForecastDate());
                         System.out.printf("Max Temperature: %.1f°C%n", Double.parseDouble(dayForecast.getTMax()));
                         System.out.printf("Min Temperature: %.1f°C%n", Double.parseDouble(dayForecast.getTMin()));
@@ -44,9 +57,11 @@ public class WeatherStarter {
                         System.out.printf("Wind Speed Class: %d%n", dayForecast.getClassWindSpeed());
                     }
                 } else {
+                    logger.error("No forecast data available for this city.");
                     System.out.println("No forecast data available for this city.");
                 }
             } else {
+                logger.error("No results for this request!");
                 System.out.println( "No results for this request!");
             }
         } catch (Exception ex) {
