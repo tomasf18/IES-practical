@@ -1,0 +1,31 @@
+[INFO ] 2024-09-20 16:18:51.387 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather forecast for 1010500, PT
+[INFO ] 2024-09-20 16:18:51.388 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Date: 2024-09-20
+[INFO ] 2024-09-20 16:18:51.389 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Max Temperature: 23.0°C
+[INFO ] 2024-09-20 16:18:51.389 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Min Temperature: 15.7°C
+[INFO ] 2024-09-20 16:18:51.389 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather Type: NW
+[INFO ] 2024-09-20 16:18:51.389 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Direction: NW
+[INFO ] 2024-09-20 16:18:51.389 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Speed: 1 km/h
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Date: 2024-09-21
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Max Temperature: 20.7°C
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Min Temperature: 14.7°C
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather Type: NW
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Direction: NW
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Speed: 1 km/h
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Date: 2024-09-22
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Max Temperature: 20.1°C
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Min Temperature: 13.8°C
+[INFO ] 2024-09-20 16:18:51.390 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather Type: W
+[INFO ] 2024-09-20 16:18:51.391 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Direction: W
+[INFO ] 2024-09-20 16:18:51.391 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Speed: 1 km/h
+[INFO ] 2024-09-20 16:18:51.391 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Date: 2024-09-23
+[INFO ] 2024-09-20 16:18:51.391 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Max Temperature: 19.0°C
+[INFO ] 2024-09-20 16:18:51.391 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Min Temperature: 13.2°C
+[INFO ] 2024-09-20 16:18:51.392 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather Type: NW
+[INFO ] 2024-09-20 16:18:51.392 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Direction: NW
+[INFO ] 2024-09-20 16:18:51.392 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Speed: 1 km/h
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Date: 2024-09-24
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Max Temperature: 22.0°C
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Min Temperature: 14.5°C
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Weather Type: S
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Direction: S
+[INFO ] 2024-09-20 16:18:51.393 [ex2.lab1.ies.deti.ua.WeatherStarter.main()] WeatherStarter - Wind Speed: 1 km/h
