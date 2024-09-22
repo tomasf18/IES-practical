@@ -455,7 +455,7 @@ Let’s break down a basic example for a Node.js application:
 
 ```dockerfile
 # Step 1: Specify the base image
-FROM node:14
+FROM node:14 
 
 # Step 2: Set the working directory inside the container
 WORKDIR /app
@@ -582,7 +582,7 @@ If you want to share your Docker image with others, you can push it to **Docker 
 
 Now, your image is available online, and anyone can pull it using:
 ```bash
-docker pull yourusername/my-node-app
+    docker pull yourusername/my-node-app
 ```
 
 ---
@@ -746,6 +746,72 @@ I built a container image that packages my application and push it to Docker Hub
 
 
 
+# Portainer
+
+Portainer is a lightweight, open-source management tool for Docker and Kubernetes environments. It provides a simple and intuitive web-based user interface (UI) that allows you to manage your containerized applications and infrastructure without needing to use the command line.
+
+### Key Features of Portainer:
+1. **Web-Based UI**: Portainer gives you an easy-to-use web interface to manage Docker containers, images, networks, and volumes.
+2. **Multi-Environment Support**: It supports Docker standalone, Docker Swarm, Kubernetes, and Edge environments.
+3. **Container Management**: You can create, start, stop, delete, and inspect containers.
+4. **Volume and Network Management**: Easily create and manage Docker volumes and networks.
+5. **Image Management**: Manage Docker images, including pulling images from Docker Hub or private registries, and deploying them.
+6. **Stacks and Templates**: Portainer supports Docker Compose and allows you to deploy multi-container applications (stacks). You can also create and manage application templates for easy reuse.
+7. **User and Team Management**: Create users and teams with role-based access control (RBAC) to manage who can interact with resources in the Docker or Kubernetes environment.
+8. **Logs and Console Access**: Direct access to container logs and the ability to open a console into a running container for debugging.
+9. **App Templates**: A library of pre-configured applications for quick deployment.
+10. **Edge Compute Management**: Manage distributed edge computing nodes via agents that communicate with the central Portainer instance.
+
+### What You Can Do with Portainer:
+
+1. **Deploy and Manage Containers**:
+   - Quickly spin up new containers from images and manage their lifecycle (start, stop, restart, remove).
+   - Manage Docker Compose applications (stacks) via the UI.
+
+2. **Manage Docker Images**:
+   - Pull images from Docker Hub or a private registry.
+   - Manage and update your images, view the list of available images, and remove unused images.
+
+3. **Monitor Containers and Logs**:
+   - Monitor your containers' performance and resource usage (CPU, memory).
+   - View logs for troubleshooting issues and get insights into running containers.
+
+4. **Volume and Network Management**:
+   - Create and manage Docker volumes to persist container data.
+   - Set up and manage networks to isolate and link containers.
+
+5. **Simplify Multi-Environment Orchestration**:
+   - Manage Docker Swarm and Kubernetes clusters, including services, stacks, and nodes.
+   - Deploy and manage complex applications across multiple environments from a single interface.
+
+6. **User Management and Security**:
+   - Set up role-based access control (RBAC) to assign different levels of permissions to users and teams.
+   - Add authentication and authorization layers to ensure secure access to your Docker or Kubernetes environments.
+
+7. **Templates for Easy Deployment**:
+   - Portainer comes with a set of templates that allow you to quickly deploy common applications like Nginx, MySQL, WordPress, etc.
+
+8. **Edge Compute**:
+   - If you're managing IoT devices or distributed edge nodes, you can use Portainer's Edge Compute features to deploy and manage containers remotely using Edge agents.
+
+### Who Can Benefit from Portainer:
+- **Developers**: Easily manage your local Docker environment without needing to remember all the CLI commands.
+- **System Administrators**: Manage multiple Docker or Kubernetes environments with less overhead.
+- **Teams**: Use Portainer's RBAC to allow teams to collaborate on managing applications, while ensuring security and control over your environment.
+- **Edge Computing Enthusiasts**: Manage remote edge nodes efficiently with minimal manual intervention.
+
+In summary, Portainer simplifies container and infrastructure management with an easy-to-use graphical interface, saving time and reducing the complexity of working with Docker or Kubernetes.
+
+## How to login 
+
+I can log into my Portainer Server instance by opening a web browser and going to:
+
+```txt
+    https://localhost:9443
+```
+
+
+
 # Notes
 
 Compile and run the project, either from the IDE or the CLI:
@@ -760,5 +826,53 @@ Compile and run the project, either from the IDE or the CLI:
     mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" -Dexec.args="arg0 arg1 arg2" 
 ```
 
+## Docker deamon not running issue
+
+```txt
+Cannot connect to the Docker daemon at unix:///home/tomas/.docker/desktop/docker.sock. Is the docker daemon running?
+```
+
+The error message you're seeing indicates that the Docker daemon is not running or is not accessible via the current socket (`unix:///home/tomas/.docker/desktop/docker.sock`). This can happen if the Docker service is not properly started.
+
+Here are steps to troubleshoot and resolve the issue:
+
+### 1. **Check if the Docker Daemon is Running**
+
+You can check the status of the Docker daemon with:
+
+```bash
+sudo systemctl status docker
+```
+
+- If Docker is running, you'll see "active (running)" in the output.
+- If it's not running, you can start it:
+
+```bash
+sudo systemctl start docker
+```
+
+### 2. **Enable Docker to Start at Boot (Optional)**
+
+If you want Docker to start automatically at boot:
+
+```bash
+sudo systemctl enable docker
+```
+
+### 3. **Check the Docker Socket Path**
+
+It looks like your Docker is attempting to use a socket path related to `docker-desktop` (`/home/tomas/.docker/desktop/docker.sock`). This path might not be correct for your setup. You can check the default socket location with:
+
+```bash
+docker info | grep 'Docker Root Dir'
+```
+
+To verify that the correct socket is being used, you can set the `DOCKER_HOST` environment variable temporarily:
+
+```bash
+export DOCKER_HOST=unix:///var/run/docker.sock
+```
+
+Then try running your command again.
 
 
