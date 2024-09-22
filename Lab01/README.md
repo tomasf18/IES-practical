@@ -2,6 +2,8 @@
 
 # Objective of this lab
 
+#### Note: This content is well explained in the TP slides "IES_01_GitMaven.pdf"  
+
 Professional software engineering relies on team-oriented tools and practices to enhance development 
 effectiveness. These tools should promote productivity, collective ownership, code/effort reusing, and 
 deter from the mentality of “it works on my computer…”.  
@@ -173,13 +175,13 @@ For example:
 
 Developers should take steps to `avoid` the possibility of `two published packages having the same name` by choosing unique 
 package names for packages that are widely distributed.  
-This allows packages to be easily and automatically installed and catalogued. 
+This allows packages to be easily and automatically installed and catalogued.  
 
 I form a unique package name by first having (or belonging to an organization that has) an Internet domain name, such as `ua.pt`.  
 I then reverse this name, component by component, to obtain, in this example, `pt.ua`, and use this as a prefix for your package names, 
 using a convention developed within your organization to further administer package names.  
 The name of a package is not meant to imply where the package is stored within the Internet.  
-I can create as many subgroups as I want. A good way to determine the granularity of the groupId is to use the `project structure`.
+I can create as many subgroups as I want. A good way to determine the granularity of the groupId is to use the `project structure`.  
 
 
 ## artifactId
@@ -429,12 +431,327 @@ Guess where this last file had to be located? Yup, `src/main/resources`!
 
 
 
+# Docker - ChatGPT
+
+
+## Explanation
+
+Imagine you’re developing an application on your laptop. Everything works fine, but when you try to run the same app on another computer or server, it crashes because that system has different software, settings, or dependencies. This problem happens a lot in software development when moving applications from one environment to another.
+
+Docker solves this issue by packaging your application and all its dependencies into containers. A container is like a lightweight, standalone package that includes everything your app needs to run, such as libraries, configuration files, and system tools. This way, your app will work consistently across different environments—whether it’s your local machine, a test server, or a production environment.
+
+Containers are isolated from each other and the host machine, which means they won’t interfere with each other’s settings or dependencies. Docker is popular because it’s efficient (containers are lightweight compared to traditional virtual machines) and makes it easier to develop, test, and deploy applications in any environment.
+
+
+### **Step 1: Install Docker**
+
+### **Step 2: Create a Dockerfile**
+
+The **Dockerfile** is a key part of Docker. It’s a simple text file that contains a set of instructions to tell Docker how to build your application’s environment.
+
+Let’s break down a basic example for a Node.js application:
+
+#### Example Dockerfile:
+
+```dockerfile
+# Step 1: Specify the base image
+FROM node:14
+
+# Step 2: Set the working directory inside the container
+WORKDIR /app
+
+# Step 3: Copy the package.json and install dependencies
+COPY package.json ./
+RUN npm install
+
+# Step 4: Copy the rest of the application code into the container
+COPY . .
+
+# Step 5: Expose a port to allow external access
+EXPOSE 3000
+
+# Step 6: Define the command to start the application
+CMD ["npm", "start"]
+```
+
+**Explanation:**
+1. `FROM node:14`: This tells Docker to start with a base image of Node.js version 14. The base image is a pre-configured environment with specific software, in this case, Node.js. Docker Hub has lots of official base images for different technologies (Node, Python, Java, etc.).
+
+2. `WORKDIR /app`: This sets the working directory inside the container. Every command that follows will happen inside `/app` in the container, just like a specific folder on your computer. Think of it as the "home" folder for your app in the container.
+
+3. `COPY package.json ./`: This copies the `package.json` file from your local project folder into the container. Docker needs this to install the project dependencies.
+
+4. `RUN npm install`: This runs the command `npm install` inside the container to install all the Node.js dependencies from the `package.json` file.
+
+5. `COPY . .`: This copies all the other files from your local project folder into the container (like the app's code files).
+
+6. `EXPOSE 3000`: This tells Docker that your application will be listening on port 3000 inside the container. It’s how Docker manages external access to the container.
+
+7. `CMD ["npm", "start"]`: This is the command that Docker will run to start your application once the container is up. In this case, it tells Docker to run `npm start`, which will start your Node.js app.
+
+---
+
+### **Step 3: Build a Docker Image**
+
+Once you’ve created your Dockerfile, the next step is to build a **Docker image** from it. A Docker image is a snapshot of your application and its environment, ready to be used for running containers.
+
+#### Command to build an image:
+```bash
+docker build -t my-node-app .
+```
+
+**Explanation:**
+- `docker build`: This is the command to build a Docker image.
+- `-t my-node-app`: This flag tags (names) your image as `my-node-app`. You can give it any name you want.
+- `.`: This tells Docker to look in the current directory (where your Dockerfile is) to find the Dockerfile and other necessary files.
+
+After this command runs, Docker will go through your Dockerfile, follow each instruction, and create an image. You can see the list of your built images by running:
+```bash
+docker images
+```
+
+---
+
+### **Step 4: Run a Docker Container**
+
+Now that you’ve built the image, you can run it as a **Docker container**. A container is a running instance of an image, isolated from your host system but with everything your app needs.
+
+#### Command to run a container:
+```bash
+docker run -p 3000:3000 my-node-app
+```
+
+**Explanation:**
+- `docker run`: This starts a new container from an image.
+- `-p 3000:3000`: This maps port 3000 on your machine to port 3000 inside the container. This is crucial because your app inside the container is running on port 3000, and you want to access it through the same port on your local machine. You can open a browser and go to `http://localhost:3000` to see your app.
+- `my-node-app`: This is the name of the image you just built. Docker will use this image to run the container.
+
+Once the container is running, it isolates your app in its own environment, meaning it won’t interfere with other programs or dependencies on your machine.
+
+---
+
+### **Step 5: Check Running Containers**
+
+While your app is running in a container, you can use Docker commands to check on it.
+
+#### Command to list running containers:
+```bash
+docker ps
+```
+
+**Explanation:**
+- `docker ps`: This lists all currently running containers. It shows useful information like the container’s ID, the image it's based on, and which ports are being used.
+
+You might see something like:
+```
+CONTAINER ID  IMAGE          COMMAND           PORTS                    NAMES
+a1b2c3d4e5    my-node-app    "npm start"       0.0.0.0:3000->3000/tcp   peaceful_einstein
+```
+
+#### Stopping a container:
+When you're done with the app, you can stop the container with:
+```bash
+docker stop <container_id>
+```
+
+Replace `<container_id>` with the actual ID from the `docker ps` output (for example, `a1b2c3d4e5`).
+
+---
+
+### **Step 6: Push Docker Images to Docker Hub**
+
+If you want to share your Docker image with others, you can push it to **Docker Hub**, a cloud-based registry for storing Docker images. This allows anyone to pull and run your image.
+
+#### Steps:
+1. First, log in to Docker Hub (create an account if you don’t have one):
+    ```bash
+    docker login
+    ```
+
+2. Next, tag your image with your Docker Hub username so it can be pushed:
+    ```bash
+    docker tag my-node-app yourusername/my-node-app
+    ```
+
+    Replace `yourusername` with your actual Docker Hub username.
+
+3. Finally, push the image to Docker Hub:
+    ```bash
+    docker push yourusername/my-node-app
+    ```
+
+Now, your image is available online, and anyone can pull it using:
+```bash
+docker pull yourusername/my-node-app
+```
+
+---
+
+### **Step 7: Useful Docker Commands**
+
+Here are a few more essential Docker commands to help you manage your images and containers:
+
+- **List all images**: 
+    ```bash
+    docker images
+    ```
+    This shows all images on your machine.
+
+- **Remove an image**:
+    ```bash
+    docker rmi <image_id>
+    ```
+    This removes an image from your system. Replace `<image_id>` with the actual image ID from `docker images`.
+
+- **Remove a container**:
+    ```bash
+    docker rm <container_id>
+    ```
+    This removes a container, but first, you’ll need to stop it using `docker stop`. If you want to force remove it (stop and remove at the same time), use the `-f` flag:
+    ```bash
+    docker rm <container_id> -f
+    ```
+
+---
+
+### Summary:
+1. **Dockerfile**: Defines the environment and instructions for building your app.
+2. **Build an image**: `docker build` creates an image from the Dockerfile.
+3. **Run a container**: `docker run` starts your app in an isolated container.
+4. **Check containers**: `docker ps` lists running containers.
+5. **Push to Docker Hub**: Share your image using `docker push`.
+6. **Manage Docker**: Use commands like `docker stop`, `docker rm`, and `docker rmi` to manage containers and images.
+
+Each of these steps helps ensure your app runs consistently across different systems, and Docker makes it easy to deploy, share, and manage your applications!
+
+
+
+# Docker start guide
+
+
+## Start the project
+
+1. To get started, clone the project to your local machine (git clone).  
+
+2. Once you have the project, start the development environment using Docker Compose.  
+
+```bash
+    docker compose watch
+```
+
+3. Start making changes on the project.   
+
+4. What happened? I was able to:  
+
+- Start a complete development project with zero installation effort. The containerized environment provided the development environment, ensuring you have everything you need. You didn't have to install Node, MySQL, or any of the other dependencies directly on your machine. All you needed was Docker and a code editor.  
+- Make changes and see them immediately. This was made possible because 1) the processes running in each container are watching and responding to file changes and 2) the files are shared with the containerized environment.
+
+
+## Container images
+
+If you’re new to container images, think of them as a standardized package that contains everything needed to run an application, including its files, configuration, and dependencies. These packages can then be distributed and shared with others.  
+
+
+## Docker Hub
+
+To share your Docker images, you need a place to store them. This is where registries come in. While there are many registries, Docker Hub is the default and go-to registry for images. Docker Hub provides both a place for you to store your own images and to find images from others to either run or use as the bases for your own images.  
+
+
+## Create an image repository
+
+Now that you have an account, you can create an image repository. `Just as a Git repository holds source code, an image repository stores container images.`
+
+1. Go to Docker Hub.
+
+2. Select Create repository.
+
+3. On the Create repository page, enter the following information:
+
+    Repository name - `getting-started-todo-app`
+    Short description - feel free to enter a description if you'd like
+    Visibility - select Public to allow others to pull your customized to-do app
+
+4. Select Create to create the repository.
+
+
+## Build and push the image
+
+Now that you have a repository, you are ready to build and push your image. 
+
+  ### What is an image/Dockerfile?
+
+    Without going too deep yet, think of a container image as a single package that contains everything needed to run a process.  
+
+    Any machine that runs a container using the image, will then be able to run the application as it was built without needing anything else pre-installed on the machine.  
+
+    A Dockerfile is a text-based script that provides the instruction set on how to build the image. For this quick start, the repository already contains the Dockerfile.  
+
+
+1. To get started, clone the project to your local machine.  
+
+```bash
+    git clone https://github.com/docker/getting-started-todo-app
+```
+
+And after the project is cloned, navigate into the new directory created by the clone:
+
+```bash
+    cd getting-started-todo-app
+```
+
+2. Build the project by running the following command, swapping out `DOCKER_USERNAME` with your username.
+
+```bash
+    docker build -t DOCKER_USERNAME/getting-started-todo-app .
+```
+
+For example, if your Docker username was mobydock, you would run the following:
+
+```bash
+    docker build -t mobydock/getting-started-todo-app .
+```
+
+3. To verify the image exists locally, you can use the docker image ls command:
+
+```bash
+    docker image ls
+``` 
+
+You will see output similar to the following:
+
+```txt
+tomas@tomas-ROG-Strix-G531GT-G531GT:~/Desktop/Docker /getting-started-todo-app$ docker image ls
+REPOSITORY                         TAG       IMAGE ID       CREATED          SIZE
+tomassf/getting-started-todo-app   latest    69f4e70c886b   11 seconds ago   1.12GB
+getting-started-todo-app-client    latest    1e5d54eb05c0   27 minutes ago   1.19GB
+getting-started-todo-app-backend   latest    7d445a494e73   28 minutes ago   1.17GB
+traefik                            v2.11     1741c0b1ff49   2 days ago       168MB
+phpmyadmin                         latest    2c40d71042e9   2 weeks ago      562MB
+mysql                              8.0       f5da8fc4b539   2 months ago     573MB
+
+...
+```
+
+4. To push the image, use the docker push command. Be sure to replace `DOCKER_USERNAME` with your username:
+
+```bash
+    docker push DOCKER_USERNAME/getting-started-todo-app
+```
+
+Depending on your upload speeds, this may take a moment to push.
+
+5. What happenned?
+
+I built a container image that packages my application and push it to Docker Hub.
+
+
+
 # Notes
 
 Compile and run the project, either from the IDE or the CLI:
 ```bash
-mvn package # get dependencies, compiles the project and creates the jar
-mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" # adapt to match your own package structure and class name 
+    mvn package # get dependencies, compiles the project and creates the jar
+    mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" # adapt to match your own package structure and class name 
 ```  
 
 `Note:` `mvn exec:java` can receive command line arguments  
