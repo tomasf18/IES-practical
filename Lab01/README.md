@@ -907,6 +907,200 @@ to `docker compose up` and use `docker compose ps` to see what is currently runn
 
 - You can bring everything down, removing the containers entirely, with the `docker compose down` command.
 
+
+
+# How to use methods of classes of one maven project in another?
+
+To call functions from Project 2 in Project 1, you need to:
+
+1. **Add Project 2 as a dependency in Project 1's `pom.xml`:**
+   You'll need to include Project 2's JAR as a dependency in Project 1.
+
+   - If Project 2 is built as a Maven project, install it to your local Maven repository:
+     ```bash
+     mvn install
+     ```
+     This generates a JAR and installs it in your local Maven repository.
+     In other words, I download a .jar of my project locally. Reminding what a .jar file is:
+
+    ---
+      A **`.jar` file** (Java ARchive) is a compressed file format used to package Java classes, associated metadata, and resources (like images, text files, etc.) into a single file. Essentially, it's a **ZIP file** with a `.jar` extension, optimized for use with Java applications.
+
+      Here's what a `.jar` file typically contains:
+      1. **Java class files**: These are the compiled `.class` files that your Java source code gets turned into.
+      2. **Metadata**: Includes files like `META-INF/MANIFEST.MF`, which provide important information such as the main class to run (for executable `.jar` files).
+      3. **Libraries**: `.jar` files can also include other `.jar` files or external libraries your application depends on.
+      4. **Resources**: Any resources like images, text files, or configuration files that your Java application might need during runtime.
+
+      ### Uses of `.jar` files:
+      - **Executable JAR**: A `.jar` file can be packaged as an executable, which allows you to run the Java application by simply double-clicking it or using the command: `java -jar yourfile.jar`.
+      - **Library JAR**: A `.jar` file can be used as a library that other Java applications can include and use.
+
+      ### Benefits of using `.jar` files:
+      - **Portability**: Bundles everything needed to run the program, making it easier to distribute and share across different platforms.
+      - **Organization**: Packages all files (classes, libraries, resources) neatly into one file.
+      - **Compression**: Since it's a ZIP format, the contents are compressed, reducing the file size.
+      
+      In your project, for example, you can bundle your Maven project into a `.jar` file to run the entire application or distribute it easily.
+     
+     ---
+
+   - Then, add Project 2's dependency in Project 1’s `pom.xml`:
+     ```xml
+     <dependency>
+       <groupId>ex5_api.lab1.ies.deti.ua</groupId>  <!-- Change to your groupId -->
+       <artifactId>ipma-api-client</artifactId>     <!-- Artifact name of Project 2 -->
+       <version>1.0-SNAPSHOT</version>             <!-- The version of Project 2 -->
+     </dependency>
+     ```
+
+2. **Import Project 2 classes in Project 1:**
+   In your `Main.java` file from Project 1, you can import the `CityForecast` class from Project 2:
+   ```java
+   import ex5_api.lab1.ies.deti.ua.CityForecast;
+   ```
+
+3. **Call Project 2 methods in Project 1:**
+   After importing, you can create an instance of `CityForecast` and call its methods. For example:
+   ```java
+   public class Main {
+       public static void main(String[] args) {
+           CityForecast cityForecast = new CityForecast();
+           // Call methods from CityForecast
+           String forecast = cityForecast.getForecast("Lisbon");
+           System.out.println("Forecast for Lisbon: " + forecast);
+       }
+   }
+   ```
+
+This setup allows Project 1 to use the functionality provided by Project 2. 
+
+
+
+# How to `dockerize` a maven project?
+
+To **dockerize** your Maven project (specifically, the **AnyCityForecast** application), you will need to:
+
+1. **Build the "fat JAR" (executable JAR)** that includes all dependencies using Maven.
+2. **Create a Dockerfile** that defines how to package and run this JAR inside a Docker container.
+3. **Build a Docker image** for your project.
+4. **Run the Docker container** that executes your Java application.
+5. **Observe logs** from the Docker container to ensure the application runs correctly.
+
+Let's break this process down:
+
+### 1. Build an Executable (Fat) JAR
+To create an executable JAR that includes all dependencies, you can use the **Maven Shade Plugin**. This ensures that all external libraries and dependencies are included in the JAR file.
+
+First, in your Maven project's `pom.xml` for **AnyCityForecast** (Project 1), add the following plugin configuration:
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>ex5.lab1.ies.deti.ua.Main</mainClass>
+                            </transformer>
+                        </transformers>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
+Now, when you run `mvn package`, it will build a JAR file that includes all necessary dependencies. The `mainClass` in the configuration points to your main class.
+
+You can test that the JAR is executable by running:
+
+```bash
+java -jar target/any-city-forecast-1.0-SNAPSHOT.jar
+```
+
+### 2. Create the Dockerfile
+
+A **Dockerfile** is needed to define the Docker image that will run your application. In the root directory of your **AnyCityForecast** project (next to the `pom.xml`), create a file named `Dockerfile` with the following content:
+
+```Dockerfile
+# Use an official OpenJDK image as the base image
+FROM openjdk:21-jdk-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built JAR file from your Maven project into the container
+COPY target/any-city-forecast-1.0-SNAPSHOT.jar /app/any-city-forecast.jar
+
+# Define the command to run the JAR file
+CMD ["java", "-jar", "any-city-forecast.jar"]
+```
+
+This Dockerfile does the following:
+- **Base Image**: Uses `openjdk:17-jdk-alpine` as the base image, which is a lightweight image with OpenJDK 17.
+- **WORKDIR**: Sets `/app` as the working directory.
+- **COPY**: Copies the JAR file built by Maven into the container.
+- **CMD**: Specifies the command to run the JAR file when the container starts.
+
+### 3. Build the Docker Image
+
+Next, you need to build the Docker image for your application. From the root of your Maven project (where the Dockerfile is located), run the following command:
+
+```bash
+docker build -t any-city-forecast .
+```
+
+This command builds the Docker image and tags it as `any-city-forecast`.
+
+### 4. Run the Docker Container
+
+Now that you have the Docker image, you can run it in a container. Use the following command to start the container:
+
+```bash
+docker run -d any-city-forecast
+```
+
+This will start the container in detached mode (`-d`), running the Java application in the background.
+
+### 5. Inspect the Logs
+
+To verify that the application is running correctly and producing the expected periodic output, you can inspect the container logs:
+
+```bash
+docker logs <container_id>
+```
+
+To get the `container_id`, you can list running containers with:
+
+```bash
+docker ps
+```
+
+### Example Workflow Summary:
+
+1. **Add the Maven Shade Plugin** to the `pom.xml` of **AnyCityForecast**.
+2. Run `mvn clean package` to create the "fat JAR".
+3. **Write the Dockerfile**.
+4. Run `docker build -t any-city-forecast .` to build the Docker image.
+5. Run `docker run -d any-city-forecast` to start the container.
+6. Use `docker logs` to verify the application's output.
+
+---
+
+
+
+
 # Notes
 
 Compile and run the project, either from the IDE or the CLI:
