@@ -686,6 +686,8 @@ Now that you have a repository, you are ready to build and push your image.
 
     A Dockerfile is a text-based script that provides the instruction set on how to build the image. For this quick start, the repository already contains the Dockerfile.  
 
+    Check that the Dockerfile has no file extension like .txt. Some editors may append this file extension automatically which results in an error when you run the application.
+
 
 1. To get started, clone the project to your local machine.  
 
@@ -811,6 +813,99 @@ I can log into my Portainer Server instance by opening a web browser and going t
 ```
 
 
+
+# Docker Compose Quickstart -> All the source code for this example is in: ~/Desktop/IES/composetest
+
+
+## Prerequisites
+
+Make sure you have:
+
+- Installed the latest version of Docker Compose
+- A basic understanding of Docker concepts and how Docker works
+
+
+## Step 1: Set up
+
+1. Create a directory for the project
+2. Create a file called app.py in your project directory (this means: "create your project source code")
+3. Create another file called requirements.txt in your project directory
+4. Create a Dockerfile
+
+
+## Step 2: Define services in a Compose file
+
+Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and 
+volumes in a single, comprehensible YAML configuration file.
+
+Create a file called compose.yaml in your project directory.
+
+
+## Step 3: Build and run your app with Compose
+
+With a single command, you create and start all the services from your configuration file.
+
+1. From your project directory, start up your application by running `docker compose up`.
+
+`Compose` pulls a Redis image, builds an image for your code, and starts the services you defined. 
+In this case, the code is statically copied into the image at build time.
+
+2. Switch to another terminal window, and type `docker image ls` to list local images.
+You can inspect images with `docker inspect <tag or id>`.
+
+3. Stop the application, either by running `docker compose down` from within your project directory in 
+the second terminal, or by hitting CTRL+C in the original terminal where you started the app.
+
+
+## Step 4: Edit the Compose file to use Compose Watch
+
+1. Edit the `compose.yaml` file in your project directory to use `watch` so you can preview your running 
+Compose services which are automatically updated as you edit and save your code.
+
+Whenever a file is changed, Compose syncs the file to the corresponding location under /code inside the container. 
+Once copied, the bundler updates the running application without a restart.
+
+
+## Step 5: Re-build and run the app with Compose
+
+From your project directory, type docker `compose watch` or `docker compose up --watch` to build and launch the app and start the file watch mode.
+
+
+## Step 6: Update the application
+
+To see Compose Watch in action:
+
+1. Change the greeting in `app.py` and save it.
+2. Refresh the app in your browser. The greeting should be updated, `and the counter should still be incrementing`.
+
+
+## Step 7: Split up your services
+
+Using multiple Compose files lets you customize a Compose application for different environments or workflows. 
+This is useful for large applications that may use dozens of containers, with ownership distributed across multiple teams.
+
+1. In your project folder, create a new Compose file called `infra.yaml`. 
+
+2. Cut the Redis service from your `compose.yaml` file and paste it into your new `infra.yaml` file. 
+Make sure you add the services top-level attribute at the top of your file.
+
+3. In your `compose.yaml` file, add the `include` top-level attribute along with the path to the `infra.yaml` file.
+
+4. Run `docker compose up` to build the app with the updated Compose files, and run it. You should see the Hello world message in your browser.
+
+This is a simplified example, but it demonstrates the basic principle of include and how it can make it easier to modularize complex applications into sub-Compose files.
+
+
+## Step 8: Experiment with some other commands
+
+- If you want to run your services in the background, you can pass the `-d` flag (for "detached" mode) 
+to `docker compose up` and use `docker compose ps` to see what is currently running.
+
+- Run `docker compose --help` to see other available commands.
+
+- If you started Compose with `docker compose up -d`, stop your services once you've finished with them: `docker compose stop`
+
+- You can bring everything down, removing the containers entirely, with the `docker compose down` command.
 
 # Notes
 
