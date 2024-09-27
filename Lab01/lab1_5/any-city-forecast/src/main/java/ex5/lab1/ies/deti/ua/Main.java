@@ -66,7 +66,6 @@ public class Main {
 
 class CityIdSelector {
 
-    // Array contendo os IDs das cidades
     private static final int[] cityIds = {
         1010500, // Aveiro
         1020500, // Beja
