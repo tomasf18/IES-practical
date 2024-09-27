@@ -6,16 +6,16 @@
 
 Professional software engineering relies on team-oriented tools and practices to enhance development 
 effectiveness. These tools should promote productivity, collective ownership, code/effort reusing, and 
-deter from the mentality of “it works on my computer…”.  
-This lab addresses the basic practices to set up a development environment that facilitates cooperative 
-development for enterprise Java projects, specifically:  
-    MAVEN - use a project build tool to configure the development project and automatically manage dependencies.  
-    GIT - collaborate in code projects using git for source code management (SCM).  
-    DOCKER - apply a container technology to speed up and reuse deployments.  
+deter from the mentality of “it works on my computer...”.  
+This lab addresses the basic practices to `set up a development environment that facilitates cooperative development` 
+for enterprise Java projects, specifically:  
+    `MAVEN` - use a project build tool to configure the development project and automatically manage dependencies.  
+    `GIT` - collaborate in code projects using git for source code management (SCM).  
+    `DOCKER` - apply a container technology to speed up and reuse deployments.  
 
 
 
-# Build Lifecycle Basics
+# Maven - Build Lifecycle Basics
 
 The regular “build” of a (large) project takes several steps (i.e., is made up of phases):
     - obtaining dependencies  
@@ -56,7 +56,7 @@ In medium to large projects, these tasks are coordinated by a `build tool`. The 
 
 # Getting started with Maven
 
-Java Maven projects can be opened in the main IDEs, but first we'll use de CLI (command line), because the entire `lifecycle`
+Java Maven projects can be opened in the main IDEs, but we'll use de CLI (command line), because the entire `lifecycle`
 can be managed from the command line.
 
 
@@ -72,7 +72,7 @@ can be managed from the command line.
 ### What did I just do?
 
 #### `archetype:generate` is named a `Maven goal`
-I executed the Maven goal archetype:generate, and passed in various parameters to that goal (` “-D” switch is used to define/pass a property to Maven in CLI`).  
+I executed the Maven goal archetype:generate, and passed in various parameters to that goal (`“-D” switch is used to define/pass a property to Maven in CLI`).  
 The prefix `archetype` is the `plugin` that provides the goal.  
 This `archetype:generate` goal created a simple project based upon a maven-archetype-quickstart archetype.  
 Suffice (Basta) it to say for now that `a plugin is a collection of goals with a general common purpose`.  
@@ -108,7 +108,8 @@ Suffice (Basta) it to say for now that `a plugin is a collection of goals with a
 
 The `pom.xml` file is the core of a project's configuration in Maven.  
 It is a single `configuration file` that `contains the` majority of `information required to build a project` in just the way you want.  
-The POM is huge and can be daunting (assustador) in its complexity, but it is not necessary to understand all of the intricacies just yet to use it effectively. 
+The POM is huge and can be daunting (assustador) in its complexity, but it is not necessary to understand all of the intricacies just 
+yet to use it effectively. 
 
 
 ## Build the Project
@@ -173,15 +174,13 @@ For example:
     org.apache.maven, org.apache.commons, ex1.Lab01.ies.deti.ua (ua.deti.ies.Lab01.ex1 -> domain.sub-domain.folder.file)
 ```
 
-Developers should take steps to `avoid` the possibility of `two published packages having the same name` by choosing unique 
-package names for packages that are widely distributed.  
-This allows packages to be easily and automatically installed and catalogued.  
-
-I form a unique package name by first having (or belonging to an organization that has) an Internet domain name, such as `ua.pt`.  
+I form a `unique` package name by first having (or belonging to an organization that has) an Internet domain name, such as `ua.pt`.  
 I then reverse this name, component by component, to obtain, in this example, `pt.ua`, and use this as a prefix for your package names, 
 using a convention developed within your organization to further administer package names.  
 The name of a package is not meant to imply where the package is stored within the Internet.  
-I can create as many subgroups as I want. A good way to determine the granularity of the groupId is to use the `project structure`.  
+I can create as many subgroups as I want. A good way to determine the granularity of the groupId is to use the `project structure`. 
+
+e.g.: Desktop/IES/Lab1/lab1_1/ex1 -----> ex1.lab1.Lab1.IES.deti.ua.pt
 
 
 ## artifactId
@@ -272,128 +271,84 @@ Note the artifact coordinates below; we can easily locate this artifact by `sear
 
 # Maven commands
 
-`Note:` `mvn exec:java` can receive command line arguments  
-`eg.:` 
-```xml 
-    mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" -Dexec.args="arg0 arg1 arg2" 
-```
-
-Here’s a list of the most useful and frequently used Maven commands along with their purposes.  
 These commands are used to build, manage dependencies, and run various phases of a Maven project lifecycle.
 
-### 1. **mvn clean**
-   - **Purpose**: Cleans the project by removing the `target/` directory, which contains all compiled files and artifacts from previous builds.
+### **mvn archetype:generate**
+   - **Purpose**: Create a project.
    - **Command**:
-     ```bash
-     mvn clean
-     ```
+```bash
+    mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+```
 
-### 2. **mvn compile**
-   - **Purpose**: Compiles the source code of the project.
-   - **Command**:
-     ```bash
-     mvn compile
-     ```
-
-### 3. **mvn package**
+## **mvn package**
    - **Purpose**: Packages the compiled code into a JAR, WAR, or any other format depending on the project's configuration.
    - **Command**:
-     ```bash
-     mvn package
-     ```
+```bash
+mvn package
+```
 
-### 4. **mvn install**
-   - **Purpose**: Installs the package (e.g., JAR file) into the local Maven repository so it can be used as a dependency in other projects.
-   - **Command**:
-     ```bash
-     mvn install
-     ```
-
-### 5. **mvn test**
-   - **Purpose**: Runs all the unit tests in the project.
-   - **Command**:
-     ```bash
-     mvn test
-     ```
-
-### 6. **mvn exec:java**
+### **mvn exec:java**
    - **Purpose**: Executes a Java class from your project using the `exec-maven-plugin`.
    - **Command** (replace `MainClass` with your fully qualified class name):
-     ```bash
-     mvn exec:java -Dexec.mainClass="com.example.MainClass"
-     ```
+```bash
+mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" -Dexec.args="arg0 arg1 arg2" 
+```
 
-### 7. **mvn clean install**
-   - **Purpose**: Combines the `clean` and `install` commands. It cleans the project and installs the compiled package into the local repository.
+### **mvn clean**
+   - **Purpose**: Cleans the project by removing the `target/` directory, which contains all compiled files and artifacts from previous builds.
    - **Command**:
-     ```bash
-     mvn clean install
-     ```
+```bash
+mvn clean
+```
 
-### 8. **mvn dependency:tree**
-   - **Purpose**: Displays the dependency tree of the project. This is useful for identifying conflicts or checking the versions of dependencies being used.
+### **mvn compile**
+   - **Purpose**: Compiles the source code of the project.
    - **Command**:
-     ```bash
-     mvn dependency:tree
-     ```
+ ```bash
+ mvn compile
+ ```
 
-### 9. **mvn dependency:resolve**
-   - **Purpose**: Resolves the dependencies and displays which ones are required by the project.
-   - **Command**:
-     ```bash
-     mvn dependency:resolve
-     ```
-
-### 10. **mvn validate**
-   - **Purpose**: Validates the project to ensure all required information is available.
-   - **Command**:
-     ```bash
-     mvn validate
-     ```
-
-### 11. **mvn verify**
-   - **Purpose**: Verifies that the project is correctly built, typically by running integration tests (if any).
-   - **Command**:
-     ```bash
-     mvn verify
-     ```
-
-### 12. **mvn exec:exec**
-   - **Purpose**: Executes arbitrary programs, including external scripts, using the `exec-maven-plugin`.
-   - **Command**:
-     ```bash
-     mvn exec:exec -Dexec.executable="your_program"
-     ```
-
-### 13. **mvn versions:display-dependency-updates**
+### **mvn versions:display-dependency-updates**
    - **Purpose**: Shows the latest versions of dependencies, highlighting any newer versions that are available.
    - **Command**:
-     ```bash
-     mvn versions:display-dependency-updates
-     ```
+```bash
+mvn versions:display-dependency-updates
+```
 
-### 14. **mvn site**
-   - **Purpose**: Generates project reports, including Javadocs, test reports, and more.
+### **mvn test**
+   - **Purpose**: Runs all the unit tests in the project.
    - **Command**:
-     ```bash
-     mvn site
-     ```
+```bash
+mvn test
+```
 
-### 15. **mvn help:describe**
-   - **Purpose**: Provides information about a specific goal or phase in Maven. Useful if you want more details on a particular command.
-   - **Command** (replace `goal` with the Maven goal you're interested in):
-     ```bash
-     mvn help:describe -Dgoal=compile
-     ```
-
-### 16. **mvn jetty:run**
-   - **Purpose**: Runs a web application using Jetty (an embedded web server).
+### **mvn install**
+   - **Purpose**: Installs the package (e.g., JAR file) into the local Maven repository so it can be used as a dependency in other projects.
    - **Command**:
-     ```bash
-     mvn jetty:run
-     ```
+```bash
+mvn install
+```
 
-These commands will help you manage your Maven projects efficiently, from compiling to deploying, and checking dependencies.
+### **mvn clean install**
+   - **Purpose**: Combines the `clean` and `install` commands. It cleans the project and installs the compiled package into the local repository.
+   - **Command**:
+```bash
+mvn clean install
+```
+
+### **mvn dependency:tree**
+   - **Purpose**: Displays the dependency tree of the project. This is useful for identifying conflicts or checking the versions of dependencies being used.
+   - **Command**:
+```bash
+mvn dependency:tree
+```
+
+### **mvn dependency:resolve**
+   - **Purpose**: Resolves the dependencies and displays which ones are required by the project.
+   - **Command**:
+```bash
+mvn dependency:resolve
+```
 
 
 
@@ -423,7 +378,7 @@ Here, I was able to store the configuration file for logging support, `log4j2.xm
 
 
 
-# File logging integration
+# File/Console logging integration
 
 To add this new feature, I used the recommended logging library `Log4j2`.  
 I had to add its dependencies to the `pom file` (the links provided have all the info), and also to create the logging configuration file `log4j2.xml`.  
@@ -438,9 +393,9 @@ Guess where this last file had to be located? Yup, `src/main/resources`!
 
 Imagine you’re developing an application on your laptop. Everything works fine, but when you try to run the same app on another computer or server, it crashes because that system has different software, settings, or dependencies. This problem happens a lot in software development when moving applications from one environment to another.
 
-Docker solves this issue by packaging your application and all its dependencies into containers. A container is like a lightweight, standalone package that includes everything your app needs to run, such as libraries, configuration files, and system tools. This way, your app will work consistently across different environments—whether it’s your local machine, a test server, or a production environment.
+Docker solves this issue by packaging your application and all its dependencies into containers. A container is like a lightweight, standalone package that includes everything your app needs to run, such as libraries, configuration files, and system tools. This way, your app will work consistently across different environments - whether it’s your local machine, a test server, or a production environment.
 
-Containers are isolated from each other and the host machine, which means they won’t interfere with each other’s settings or dependencies. Docker is popular because it’s efficient (containers are lightweight compared to traditional virtual machines) and makes it easier to develop, test, and deploy applications in any environment.
+Containers are isolated from each other and the host machine, which means they won’t interfere with each other’s settings or dependencies. Docker is popular because it’s efficient (`containers are lightweight compared to traditional virtual machines`) and makes it easier to develop, test, and deploy applications in any environment.
 
 
 ### **Step 1: Install Docker**
@@ -503,13 +458,12 @@ docker build -t my-node-app .
 **Explanation:**
 - `docker build`: This is the command to build a Docker image.
 - `-t my-node-app`: This flag tags (names) your image as `my-node-app`. You can give it any name you want.
-- `.`: This tells Docker to look in the current directory (where your Dockerfile is) to find the Dockerfile and other necessary files.
+- `.`: This tells Docker to look in the current directory (`where your Dockerfile is`) `to find the Dockerfile and other necessary files`.
 
 After this command runs, Docker will go through your Dockerfile, follow each instruction, and create an image. You can see the list of your built images by running:
 ```bash
 docker images
 ```
-
 ---
 
 ### **Step 4: Run a Docker Container**
@@ -636,7 +590,7 @@ Each of these steps helps ensure your app runs consistently across different sys
 2. Once you have the project, start the development environment using Docker Compose.  
 
 ```bash
-    docker compose watch
+    docker compose watch # So the changes can be updated automatically
 ```
 
 3. Start making changes on the project.   
@@ -686,7 +640,7 @@ Now that you have a repository, you are ready to build and push your image.
 
     A Dockerfile is a text-based script that provides the instruction set on how to build the image. For this quick start, the repository already contains the Dockerfile.  
 
-    Check that the Dockerfile has no file extension like .txt. Some editors may append this file extension automatically which results in an error when you run the application.
+    Check that the Dockerfile has no file extension like .txt. `Some editors may append this file extension automatically which results in an error when you run the application`.
 
 
 1. To get started, clone the project to your local machine.  
@@ -748,6 +702,218 @@ I built a container image that packages my application and push it to Docker Hub
 
 
 
+# Docker commands
+
+Here’s a list of the most useful Docker commands, covering everything from creating a Dockerized app to building, 
+running, and managing your containers and images:
+
+---
+
+### **1. Dockerfile Creation**
+You need a `Dockerfile` to define how to set up the environment for your app. You’ll write a `Dockerfile` with specific instructions (see above for an example).
+
+---
+
+### **2. Build a Docker Image**
+Once your Dockerfile is ready, build the Docker image using this command:
+
+```bash
+docker build -t <image_name> .
+```
+
+- `-t <image_name>`: Tags the image with a name (e.g., `my-app`).
+- `.`: The dot tells Docker to look in the current directory for the `Dockerfile`.
+
+Example:
+```bash
+docker build -t my-app .
+```
+
+---
+
+### **3. Run a Docker Container**
+After the image is built, you can run a container from it:
+
+```bash
+docker run -d -p <host_port>:<container_port> <image_name>
+```
+
+- `-d`: Runs the container in detached mode (in the background).
+- `-p`: Maps the host machine's port to the container's port (e.g., `8080:80`).
+- `<image_name>`: The name of the image to run.
+
+Example:
+```bash
+docker run -d -p 8080:3000 my-app
+```
+
+This maps port 3000 in the container to port 8080 on your machine, so you can access the app via `localhost:8080`.
+
+---
+
+### **4. Check Running Containers**
+To see a list of all running containers, use:
+
+```bash
+docker ps
+```
+
+This shows information like the container ID, the image it’s using, and the ports it’s mapped to.
+
+---
+
+### **5. Stop a Running Container**
+To stop a container, use:
+
+```bash
+docker stop <container_id>
+```
+
+You can get the container ID from the `docker ps` output.
+
+---
+
+### **6. Remove a Container**
+To remove a stopped container:
+
+```bash
+docker rm <container_id>
+```
+
+If the container is running, you can stop and remove it in one step using:
+
+```bash
+docker rm <container_id> -f
+```
+
+---
+
+### **7. List Docker Images**
+To list all Docker images on your machine:
+
+```bash
+docker images
+```
+
+This shows the image name, tag, and ID.
+
+---
+
+### **8. Remove a Docker Image**
+To remove an image that you no longer need:
+
+```bash
+docker rmi <image_id>
+```
+
+Get the image ID from `docker images`.
+
+---
+
+### **9. View Container Logs**
+To see the logs from a running container:
+
+```bash
+docker logs <container_id>
+```
+
+This helps debug any issues by showing the output your app is generating.
+
+---
+
+### **10. Access a Running Container (Interactive Mode)**
+To open a shell inside a running container for debugging or exploration:
+
+```bash
+docker exec -it <container_id> /bin/bash
+```
+
+This gives you a shell in the container, where you can run commands and inspect the environment.
+
+---
+
+### **11. Push an Image to Docker Hub**
+Once you have your image ready, you can push it to Docker Hub for others to use.
+
+1. First, log in to Docker Hub:
+    ```bash
+    docker login
+    ```
+
+2. Tag the image:
+    ```bash
+    docker tag <image_name> <username>/<repository_name>:<tag>
+    ```
+
+3. Push the image to your Docker Hub repository:
+    ```bash
+    docker push <username>/<repository_name>:<tag>
+    ```
+
+Example:
+```bash
+docker tag my-app myusername/my-app:v1
+docker push myusername/my-app:v1
+```
+
+---
+
+### **12. Pull an Image from Docker Hub**
+To download an image from Docker Hub:
+
+```bash
+docker pull <username>/<repository_name>:<tag>
+```
+
+Example:
+```bash
+docker pull myusername/my-app:v1
+```
+
+---
+
+### **13. Stop All Running Containers**
+If you want to stop all running containers at once:
+
+```bash
+docker stop $(docker ps -q)
+```
+
+---
+
+### **14. Remove All Stopped Containers**
+To clean up all containers that are no longer running:
+
+```bash
+docker rm $(docker ps -a -q)
+```
+
+---
+
+### **15. Remove All Docker Images**
+To remove all images from your system:
+
+```bash
+docker rmi $(docker images -q)
+```
+
+---
+
+### **16. Docker Compose (for multi-container apps)**
+If your app has multiple services (like a web server and a database), Docker Compose helps you manage them easily by defining everything in a `compose.yaml` file.
+
+To start all services defined in the `compose.yaml` file:
+```bash
+docker compose up -d
+```
+
+To stop them:
+```bash
+docker compose down
+```
+
+---
+
 # Portainer
 
 Portainer is a lightweight, open-source management tool for Docker and Kubernetes environments. It provides a simple and intuitive web-based user interface (UI) that allows you to manage your containerized applications and infrastructure without needing to use the command line.
@@ -766,48 +932,22 @@ Portainer is a lightweight, open-source management tool for Docker and Kubernete
 
 ### What You Can Do with Portainer:
 
-1. **Deploy and Manage Containers**:
-   - Quickly spin up new containers from images and manage their lifecycle (start, stop, restart, remove).
-   - Manage Docker Compose applications (stacks) via the UI.
-
-2. **Manage Docker Images**:
-   - Pull images from Docker Hub or a private registry.
-   - Manage and update your images, view the list of available images, and remove unused images.
-
-3. **Monitor Containers and Logs**:
-   - Monitor your containers' performance and resource usage (CPU, memory).
-   - View logs for troubleshooting issues and get insights into running containers.
-
-4. **Volume and Network Management**:
-   - Create and manage Docker volumes to persist container data.
-   - Set up and manage networks to isolate and link containers.
-
-5. **Simplify Multi-Environment Orchestration**:
-   - Manage Docker Swarm and Kubernetes clusters, including services, stacks, and nodes.
-   - Deploy and manage complex applications across multiple environments from a single interface.
-
-6. **User Management and Security**:
-   - Set up role-based access control (RBAC) to assign different levels of permissions to users and teams.
-   - Add authentication and authorization layers to ensure secure access to your Docker or Kubernetes environments.
-
-7. **Templates for Easy Deployment**:
-   - Portainer comes with a set of templates that allow you to quickly deploy common applications like Nginx, MySQL, WordPress, etc.
-
-8. **Edge Compute**:
-   - If you're managing IoT devices or distributed edge nodes, you can use Portainer's Edge Compute features to deploy and manage containers remotely using Edge agents.
-
-### Who Can Benefit from Portainer:
-- **Developers**: Easily manage your local Docker environment without needing to remember all the CLI commands.
-- **System Administrators**: Manage multiple Docker or Kubernetes environments with less overhead.
-- **Teams**: Use Portainer's RBAC to allow teams to collaborate on managing applications, while ensuring security and control over your environment.
-- **Edge Computing Enthusiasts**: Manage remote edge nodes efficiently with minimal manual intervention.
-
-In summary, Portainer simplifies container and infrastructure management with an easy-to-use graphical interface, saving time and reducing the complexity of working with Docker or Kubernetes.
+1. **Deploy and Manage Containers**
+2. **Manage Docker Images**
+3. **Monitor Containers and Logs**
+4. **Volume and Network Management**
+5. **Simplify Multi-Environment Orchestration**
+6. **User Management and Security**
+7. **Templates for Easy Deployment**
+8. **Edge Compute**
 
 ## How to login 
 
-I can log into my Portainer Server instance by opening a web browser and going to:
-
+I can log into my Portainer Server instance by starting the container:
+```bash
+docker start portrait
+```
+then opening a web browser and going to:
 ```txt
     https://localhost:9443
 ```
@@ -1097,71 +1237,3 @@ docker ps
 6. Use `docker logs` to verify the application's output.
 
 ---
-
-
-
-
-# Notes
-
-Compile and run the project, either from the IDE or the CLI:
-```bash
-    mvn package # get dependencies, compiles the project and creates the jar
-    mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" # adapt to match your own package structure and class name 
-```  
-
-`Note:` `mvn exec:java` can receive command line arguments  
-`eg.:` 
-```xml 
-    mvn exec:java -Dexec.mainClass="ex2.lab1.ies.deti.ua.WeatherStarter" -Dexec.args="arg0 arg1 arg2" 
-```
-
-## Docker deamon not running issue
-
-```txt
-Cannot connect to the Docker daemon at unix:///home/tomas/.docker/desktop/docker.sock. Is the docker daemon running?
-```
-
-The error message you're seeing indicates that the Docker daemon is not running or is not accessible via the current socket (`unix:///home/tomas/.docker/desktop/docker.sock`). This can happen if the Docker service is not properly started.
-
-Here are steps to troubleshoot and resolve the issue:
-
-### 1. **Check if the Docker Daemon is Running**
-
-You can check the status of the Docker daemon with:
-
-```bash
-sudo systemctl status docker
-```
-
-- If Docker is running, you'll see "active (running)" in the output.
-- If it's not running, you can start it:
-
-```bash
-sudo systemctl start docker
-```
-
-### 2. **Enable Docker to Start at Boot (Optional)**
-
-If you want Docker to start automatically at boot:
-
-```bash
-sudo systemctl enable docker
-```
-
-### 3. **Check the Docker Socket Path**
-
-It looks like your Docker is attempting to use a socket path related to `docker-desktop` (`/home/tomas/.docker/desktop/docker.sock`). This path might not be correct for your setup. You can check the default socket location with:
-
-```bash
-docker info | grep 'Docker Root Dir'
-```
-
-To verify that the correct socket is being used, you can set the `DOCKER_HOST` environment variable temporarily:
-
-```bash
-export DOCKER_HOST=unix:///var/run/docker.sock
-```
-
-Then try running your command again.
-
-
