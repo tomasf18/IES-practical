@@ -1,15 +1,16 @@
 # 112981
 
-# Lab 1: Objective of this lab
+# Lab 2: Objective of this lab
 
    -  Deploy a java web application into an application container (servlets). 
    -  Start a simple web application with Spring Boot and Spring Initializr.
 
 ## Table of Contents
-1. [Embedded Jetty Server](#embedded-jetty-server)
-2. [Server-side programming and application servers (Tomcat) - Jakarta EE](#server-side-programming-and-application-servers-tomcat---jakarta-ee)
-3. [Spring Boot - Web development with a full-featured framework](#spring-boot---web-development-with-a-full-featured-framework)
-4. [RESTful web service - quotes](#restful-web-service---quotes)
+   1. [Embedded Jetty Server](#embedded-jetty-server)
+   2. [Server-side programming and application servers (Tomcat) - Jakarta EE](#server-side-programming-and-application-servers-tomcat---jakarta-ee)
+   3. [Spring Boot - Web development with a full-featured framework](#spring-boot---web-development-with-a-full-featured-framework)
+   4. [RESTful web service - quotes](#restful-web-service---quotes)
+   5. [References](#references)
 
 ## Embedded Jetty Server
 
@@ -313,103 +314,126 @@ This controller is concise and simple, but there is plenty going on. We break it
 
 ## RESTful web service - quotes
 
-In simpler terms, *Jakarta EE* is powerful and comprehensive, but for many cases (like creating *RESTful APIs*), we don’t need the full feature set of an application server. 
-So, for *RESTful web services, we can use **Spring Boot* to create a simple application that returns quotes depending on the request. 
-The Controller is structured as follows:
-java
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+   - *Jakarta EE* is powerful and comprehensive, but in many cases (like creating *RESTful APIs*), we don’t need the full-feature (and more complex) Application Server. 
+   - So, for *RESTful web services, we can use **Spring Boot* to create a simple API.
+   - Here is an example (for the Quotes exercise):
 
-import java.util.Map;
-import java.util.Set;
+1. Firstly, we need to create a class to represent each data object (`record`):
 
-@RestController
-public class QuotesController 
-{
-	public static Map<Integer,Set<String>> quotesDict = Map.of(
-		1, Set.of(
-			"Just when I thought I was out, they pull me back in. - The Godfather III (1990)",
-			"Life moves pretty fast. If you don't stop and look around once in a while, you could miss it. - Ferris Bueller's Day Off (1986)"
-		),
-		2, Set.of(
-			"We're goin' streaking! - Old School (2003)"
-		),
-		3, Set.of(
-			"I'm sorry father, for you there is only death. But our destiny is life! - The Fountain (2006)",
-			"Sometimes it's people closest to us who lie to us best - Arrow (2015)",
-			"Hope is a good thing, maybe the best of things, and no good thing ever dies. - Shawshank Redemption (1994)"
-		),
-		... // TODO: complete this list
-	);
+```java
+   public record Quote(int id, String show_name, String text) { }
+   public record Show(int id, String name) { }
+```
 
-    public record QuotesRecord(Set<String> contents) { }
-	public record ShowsRecord(Set<Integer> showsId) { }
+2. Secondly, we need a `Service` to use the data and manage it according to the request:
 
-	@GetMapping("/api/shows")
-	public ShowsRecord api_shows() 
-	{
-		return new ShowsRecord(QuotesController.quotesDict.keySet());
-	}
+```java
+   @Service
+   public class QuoteService { 
+      // hardcoded data
+      private static final List<Show> shows = List.of(
+         new Show(1, "Star Wars"),
+         new Show(2, "Titanic"),
+         new Show(3, "Avengers: Endgame"),
+         new Show(4, "Scarface")
+      );
 
-	@GetMapping("/api/quote")
-	public QuotesRecord api_quote() 
-	{
-		int randomIdx = (int) (Math.random() * quotesDict.size()) + 1;
-		return new QuotesRecord(QuotesController.quotesDict.get(randomIdx));
-	}
+      private static final List<Quote> quotes = List.of(
+         new Quote(1, "Star Wars", "May the Force be with you."),
+         new Quote(2, "Titanic", "I'm the king of the world!"),
+         new Quote(3, "Avengers: Endgame", "I am Iron Man."),
+         new Quote(4, "Scarface", "Say hello to my little friend!"),
+         new Quote(5, "Star Wars", "I find your lack of faith disturbing."),
+         new Quote(6, "Titanic", "I'll never let go, Jack. I promise.")
+      );
+      
+      public List<Show> getShows() {
+         return shows;
+      }
 
-	@GetMapping("/api/quotes")
-	public QuotesRecord api_quote(@RequestParam(value="show", required=false, defaultValue="-1") int showID) 
-	{
-		if (!QuotesController.quotesDict.containsKey(showID)) {
-			return new QuotesRecord(Set.of("Show not found. Usage: /api/quotes?show=<showID>"));
-		}
+      public Quote getRandomQuote() {
+         return quotes.get((int) (Math.random() * quotes.size()));
+      }
 
-		return new QuotesRecord(QuotesController.quotesDict.get(showID));
-	}
-}
+      public List<Quote> getQuotesByShowId(int showId) {
+         List<Show> shows = this.getShows();
+         Show choice = shows.stream().filter(show -> show.id() == showId).findFirst().orElse(null);
+         if (choice == null) {
+               return null;
+         }
 
+         return quotes.stream().filter(quote -> quote.show_name().equals(choice.name())).collect(Collectors.toList());
+      }
+   }
+```
 
-Hear, we have three endpoints:
- - /api/shows: returns the list of shows available in the quotesDict.
- - /api/quote: returns a random quote from the quotesDict.
- - /api/quotes?show=<show_id>: returns all quotes from a specific show. If the show is not found, it returns an error message.
+3. Then, we need a `Controller` to ensure that each of the possible HTTP GET requests has a method to handle it (this controller will use the `Service` defined above):
 
-You can give a go to the application by running the following command:
-bash
-mvn clean package
-java -jar target/spring-boot-web-0.0.1-SNAPSHOT.jar
+```java
+   @RestController
+   @RequestMapping("/api")
+   public class QuoteController {
 
+      @Autowired
+      private QuoteService service;
 
-And try the endpoints:
-bash
+      @GetMapping("/quote")
+      public Quote randomQuote() {
+         return service.getRandomQuote();
+      }
+
+      @GetMapping("/shows")
+      public List<Show> shows() {
+         return service.getShows();
+      }
+
+      @GetMapping("/quotes")
+      public List<Quote> quotes(@RequestParam("show_id") String show_id) {
+         return service.getQuotesByShowId(Integer.parseInt(show_id));
+      }
+
+   }
+```
+
+4. Finally, we need to create an `application class` to run our RESTful API (this class is automatically created with Spring Initializr):
+
+```java
+   @SpringBootApplication
+   public class QuotesApiApplication {
+
+      public static void main(String[] args) {
+         SpringApplication.run(QuotesApiApplication.class, args);
+      }
+
+   }
+```
+
+   - In the end, we have three `endpoints`:
+      - `/api/shows`: returns the list of shows available in the quotesDict.
+      - `/api/quote`: returns a random quote from the quotesDict.
+      - `/api/quotes?show=<show_id>`: returns all quotes from a specific show. If the show is not found, it returns an error message.
+
+   - Run the app with the following commands:
+
+```bash
+   ./mvnw clean package
+   java -jar target/spring-boot-web-0.0.1-SNAPSHOT.jar
+```
+
+   - And try the endpoints:
+
+```bash
 curl -X GET http://localhost:8080/api/shows | jq
 curl -X GET http://localhost:8080/api/quote | jq
-curl -X GET http://localhost:8080/api/quotes?show=3 | jq
-
+curl -X GET http://localhost:8080/api/quotes?show=2 | jq
+```
 
 ## References
 
-- [Jetty Documentation](https://www.eclipse.org/jetty/documentation/)
-- [Jakarta EE Documentation](https://jakarta.ee/specifications/platform/8/)
-- [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
-- [Thymeleaf Documentation](https://www.thymeleaf.org/)
-- [Tomcat Docker Image](https://hub.docker.com/_/tomcat)
-
-
-
-
-### RESTFUL
-
-
-
-This controller is concise and simple, but there is plenty going on under the hood. We break it down step by step.
-
-The @GetMapping annotation ensures that HTTP GET requests to /greeting are mapped to the greeting() method.
-There are companion annotations for other HTTP verbs (e.g. @PostMapping for POST). There is also a @RequestMapping annotation that they all derive from, and can serve as a synonym (e.g. @RequestMapping(method=GET)).
-
-A key difference between a traditional MVC controller and the RESTful web service controller shown earlier is the way that the HTTP response body is created. Rather than relying on a view technology to perform server-side rendering of the greeting data to HTML, this RESTful web service controller populates and returns a Greeting object. The object data will be written directly to the HTTP response as JSON.
-
-# METER OS LINKS EM VEZ DESTE TEXTO TODO
+   - [Jetty Documentation](https://jetty.org/docs/index.html)
+   - [Jakarta EE Documentation](https://jakarta.ee/specifications/platform/8/)
+   - [Spring Boot Documentation](https://docs.spring.io/spring-boot/documentation.html)
+   - [Thymeleaf Documentation](https://www.thymeleaf.org/)
+   - [Tomcat Docker Image](https://hub.docker.com/_/tomcat)
+   - [Spring Boot RESTful API documentation](https://spring.io/guides/gs/rest-service)
 

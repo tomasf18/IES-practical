@@ -14,6 +14,23 @@ for enterprise Java projects, specifically:
     `DOCKER` - apply a container technology to speed up and reuse deployments.  
 
 
+## Table of Contents
+1. [Maven - Build Lifecycle Basics](#maven---build-lifecycle-basics)
+2. [Getting started with Maven](#getting-started-with-maven)
+3. [Naming Conventions](#naming-conventions)
+4. [POM main elements](#pom-main-elements)
+5. [Maven Commands](#maven-commands)
+6. [Standard Directory Layout](#standard-directory-layout)
+7. [File or Console Logging Integration](#file-or-console-logging-integration)
+8. [Docker - ChatGPT](#docker---chatgpt)
+9. [Docker Start Guide](#docker-start-guide)
+10. [Docker Commands](#docker-commands)
+11. [Portainer](#portainer)
+12. [Docker Compose Quickstart](#docker-compose-quickstart)
+13. [Maven Import](#maven-import)
+14. [Dockerizing a Maven Project](#dockerizing-a-maven-project)
+
+
 
 # Maven - Build Lifecycle Basics
 
@@ -269,7 +286,7 @@ Note the artifact coordinates below; we can easily locate this artifact by `sear
 
 
 
-# Maven commands
+# Maven Commands
 
 These commands are used to build, manage dependencies, and run various phases of a Maven project lifecycle.
 
@@ -352,7 +369,7 @@ mvn dependency:resolve
 
 
 
-# .gitignore
+## .gitignore
 
 Specifies intentionally untracked files to ignore
 
@@ -378,7 +395,7 @@ Here, I was able to store the configuration file for logging support, `log4j2.xm
 
 
 
-# File/Console logging integration
+# File or Console Logging Integration
 
 To add this new feature, I used the recommended logging library `Log4j2`.  
 I had to add its dependencies to the `pom file` (the links provided have all the info), and also to create the logging configuration file `log4j2.xml`.  
@@ -580,7 +597,7 @@ Each of these steps helps ensure your app runs consistently across different sys
 
 
 
-# Docker start guide
+# Docker Start Guide
 
 
 ## Start the project
@@ -702,7 +719,7 @@ I built a container image that packages my application and push it to Docker Hub
 
 
 
-# Docker commands
+# Docker Commands
 
 Here’s a list of the most useful Docker commands, covering everything from creating a Dockerized app to building, 
 running, and managing your containers and images:
@@ -954,7 +971,8 @@ then opening a web browser and going to:
 
 
 
-# Docker Compose Quickstart -> All the source code for this example is in: ~/Desktop/IES/composetest
+# Docker Compose Quickstart
+**Note**: *All the source code for this example is in: `~/Desktop/IES/composetest`*
 
 
 ## Prerequisites
@@ -1049,7 +1067,9 @@ to `docker compose up` and use `docker compose ps` to see what is currently runn
 
 
 
-# How to use methods of classes of one maven project in another?
+# Maven Import
+
+## How to use methods of classes of one maven project in another?
 
 To call functions from Project 2 in Project 1, you need to:
 
@@ -1117,7 +1137,9 @@ This setup allows Project 1 to use the functionality provided by Project 2.
 
 
 
-# How to `dockerize` a maven project?
+# Dockerizing a Maven Project 
+
+## How to `dockerize` a maven project?
 
 To **dockerize** your Maven project (specifically, the **AnyCityForecast** application), you will need to:
 
