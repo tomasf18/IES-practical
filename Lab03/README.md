@@ -8,7 +8,7 @@
 ## Table of Contents
    1. [Lab3_2_c Answers](#lab3_2_c-answers) 
    2. [Accessing Databases In SpringBoot](#accessing-databases-in-springboot)
-   3. [Server-side programming and application servers (Tomcat) - Jakarta EE](#server-side-programming-and-application-servers-tomcat---jakarta-ee)
+   3. [Multilayer Applications: Exposing Data With REST Interface](#multilayer-applications---exposing-data-with-rest-interface)
    4. [Spring Boot - Web development with a full-featured framework](#spring-boot---web-development-with-a-full-featured-framework)
    5. [RESTful web service - quotes](#restful-web-service---quotes)
    6. [References](#references)
@@ -80,15 +80,15 @@ public String addUser(@Valid User user, BindingResult result, Model model) { ...
 If the validation fails (i.e., if the email is empty or blank), an error message is stored in `BindingResult`, and the user is redirected back to the form (`add-user` template) to correct their input.
 
 
-# Check full tutorial on: [Baeldung](https://www.baeldung.com/spring-boot-crud-thymeleaf)
 ## Accessing Databases In SpringBoot
+#### Check full tutorial on: [Baeldung](https://www.baeldung.com/spring-boot-crud-thymeleaf)
 
-    - Spring Boot makes it easy to create CRUD applications through a layer of standard JPA-based CRUD repositories.
-    - We’ll learn how to develop a CRUD web application with Spring Boot and Thymeleaf.
+- Spring Boot makes it easy to create CRUD applications through a layer of standard JPA-based CRUD repositories.
+- We’ll learn how to develop a CRUD web application with Spring Boot and Thymeleaf.
 
 ### 1. Maven Dependencies
     
-    - Using `spring-boot-starter-parent`, we won’t need to specify the versions of the project dependencies in our pom.xml file, except for overriding the Java version:
+- Using `spring-boot-starter-parent`, we won’t need to specify the versions of the project dependencies in our pom.xml file, except for overriding the Java version:
     
 ```xml
 <parent>
@@ -117,7 +117,7 @@ If the validation fails (i.e., if the email is empty or blank), an error message
 
 ### 2. The Domain Layer
 
-    - For simplicity’s sake, this layer will include one single class that will be responsible for modeling `User` entities:
+- For simplicity’s sake, this layer will include one single class that will be responsible for modeling `User` entities:
 
 ```java
 @Entity
@@ -137,18 +137,18 @@ public class User {
 }
 ```
 
-    - We’ve annotated the class with the `@Entity` annotation. 
-    - Therefore, the JPA implementation, which is `Hibernate`, in this case, will be able to perform `CRUD` operations on the `domain entities` (check [Hibernate 5 with Spring](https://www.baeldung.com/hibernate-spring)).
-    - We’ve also constrained the name and email fields with the @NotBlank constraint. 
-    - Now, we can use `Hibernate Validator` for validating the constrained fields before persisting or updating an entity in the database (check [associated tutorial on Bean Validation.](https://www.baeldung.com/?__im-QylvkzKT=13326264676159996055)).
+- We’ve annotated the class with the `@Entity` annotation. 
+- Therefore, the JPA implementation, which is `Hibernate`, in this case, will be able to perform `CRUD` operations on the `domain entities` (check [Hibernate 5 with Spring](https://www.baeldung.com/hibernate-spring)).
+- We’ve also constrained the name and email fields with the @NotBlank constraint. 
+- Now, we can use `Hibernate Validator` for validating the constrained fields before persisting or updating an entity in the database (check [associated tutorial on Bean Validation.](https://www.baeldung.com/?__im-QylvkzKT=13326264676159996055)).
     
 ### 3. The Repository Layer
 
-    - Our sample web application doesn´t do anything yet.
-    - Spring Data JPA allows us to implement `JPA-based repositories` (a fancy name for the DAO pattern implementation) with minimal fuss (complicação).
-    - [Spring Data JPA](https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa) is a key component of Spring Boot’s `spring-boot-starter-data-jpa`that makes it easy to add CRUD functionality through a powerful `layer of abstraction` placed on top of a JPA implementation. 
-    - It allows us to access the persistence layer without having to provide our own DAO implementations from scratch.
-    - To provide our application with basic `CRUD functionality` on `User object`s, we just need to `extend the CrudRepository interface`:
+- Our sample web application doesn´t do anything yet.
+- Spring Data JPA allows us to implement `JPA-based repositories` (a fancy name for the DAO pattern implementation) with minimal fuss (complicação).
+- [Spring Data JPA](https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa) is a key component of Spring Boot’s `spring-boot-starter-data-jpa`that makes it easy to add CRUD functionality through a powerful `layer of abstraction` placed on top of a JPA implementation. 
+- It allows us to access the persistence layer without having to provide our own DAO implementations from scratch.
+- To provide our application with basic `CRUD functionality` on `User object`s, we just need to `extend the CrudRepository interface`:
 
 ```java
 @Repository
@@ -158,11 +158,11 @@ public interface UserRepository extends CrudRepository<User, Long> {}
 
 ### 4. The Controller Layer
 
-    - With the previous the `layer of abstraction`, we can easily add some CRUD functionality to our web application through a basic web tier.
-    - In this case, a `single controller class` will suffice for handling `GET` and `POST HTTP` requests and then mapping them to calls to our UserRepository implementation.
-    - With this said, yhe controller layer is responsible for `processing user requests` and `building appropriate responses`.
-    - The controller class relies on some of [Spring MVC’s](https://www.baeldung.com/spring-mvc-tutorial) key features.
-    - Let’s start with the following controller methods:
+- With the previous the `layer of abstraction`, we can easily add some CRUD functionality to our web application through a basic web tier.
+- In this case, a `single controller class` will suffice for handling `GET` and `POST HTTP` requests and then mapping them to calls to our UserRepository implementation.
+- With this said, yhe controller layer is responsible for `processing user requests` and `building appropriate responses`.
+- The controller class relies on some of [Spring MVC’s](https://www.baeldung.com/spring-mvc-tutorial) key features.
+- Let’s start with the following controller methods:
 
 ```java
 @Controller
@@ -236,9 +236,9 @@ public class UserController {
 
 ### 5. The View Layer
 
-    - There’s still a missing component in this schema: `the view layer`.
-    - Under the `src/main/resources/templates` folder, we need to `create the HTML templates` required for displaying the list of User entities and the signup and the update forms.
-    - We’ll use Thymeleaf as the underlying template engine for parsing the template files.
+- There’s still a missing component in this schema: `the view layer`.
+- Under the `src/main/resources/templates` folder, we need to `create the HTML templates` required for displaying the list of User entities and the signup and the update forms.
+- We’ll use Thymeleaf as the underlying template engine for parsing the template files.
  
 `add-user.html`
 ```html
@@ -299,12 +299,12 @@ public class UserController {
 </div>
 ```
 
-    - To give the templates an improved, eye-catching look without spending too much time on HTML/CSS, we can easily use a free [Twitter Bootstrap UI kit](https://getbootstrap.com/), such as [Shards](https://designrevision.com/downloads/shards/).
+- To give the templates an improved, eye-catching look without spending too much time on HTML/CSS, we can easily use a free [Twitter Bootstrap UI kit](https://getbootstrap.com/), such as [Shards](https://designrevision.com/downloads/shards/).
 
 ### 6. Running the Application
 
-    - Let’s define the application’s entry point.
-    - Like most Spring Boot applications, we can do this with a `main()` method:
+- Let’s define the application’s entry point.
+- Like most Spring Boot applications, we can do this with a `main()` method:
     
 ```java
 @SpringBootApplication
@@ -316,7 +316,33 @@ public class Application {
 }
 ```
 
-    - We can now run the application by executing the `main()` method.
-    - The application will be available at `http://localhost:8080/index`.
-    - We should see a basic CRUD user dashboard with links for adding new entities and for editing and removing existing ones.
+- We can now run the application by executing the `main()` method.
 
+```bash
+mvn clean package
+mvn exec:java -Dexec.mainClass="ies.lab3.ex1.lab3_1.JpaApplication"
+```
+
+- The application will be available at `http://localhost:8080/index`.
+- We should see a basic CRUD user dashboard with links for adding new entities and for editing and removing existing ones.
+
+
+## Multilayer Applications - Exposing Data With REST Interface 
+- In this exercise, we'll need an instance of MySQL server (v5.7).
+- For that, we can use a container:
+
+```bash
+docker run --name mysql5 -e MYSQL_ROOT_PASSWORD=secret1 -e MYSQL_DATABASE=demo -e MYSQL_USER=demo -e MYSQL_PASSWORD=secret2 -p 33060:3306 -d mysql/mysql-server:5.7
+```
+
+#### Check full tutorial on: [javaguides.net](https://www.javaguides.net/2018/09/spring-boot-2-jpa-mysql-crud-example.html) (scroll down)
+
+- Learn how to build CRUD RESTful API using Spring Boot 3, Spring Data JPA (Hibernate), and MySQL database
+- We are going to use `three-layer architecture` in our Spring boot project:   
+![Three-Layer Architecture](images/image1.png) 
+
+### 1. Create and Setup Spring Boot Project (Spring Initializr)
+- Project Structure:  
+![Project Structure](images/image2.png)
+
+### 2. 
