@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
+		<version>3.3.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>org.ies.deti.ua</groupId>
-	<artifactId>Ex2</artifactId>
+	<groupId>ies.lab3</groupId>
+	<artifactId>lab3_3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Ex2</name>
+	<name>ex3</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

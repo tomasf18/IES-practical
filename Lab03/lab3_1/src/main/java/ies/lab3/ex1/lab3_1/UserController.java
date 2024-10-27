@@ -13,9 +13,9 @@ import jakarta.validation.Valid;
 @Controller
 public class UserController {
 
-    EmployeeRepository userRepository;
+    UserRepository userRepository;
 
-    public UserController(EmployeeRepository userRepository) {
+    public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

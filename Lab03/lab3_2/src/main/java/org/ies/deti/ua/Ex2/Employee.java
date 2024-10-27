@@ -1,22 +1,31 @@
-package ies.lab3.ex1.lab3_2;
+package org.ies.deti.ua.Ex2;
 
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
-@Entity //(name = "tbl_user")
+@Entity 
+@Table(name = "employees")
 public class Employee {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    
+
     @NotBlank(message = "Name is mandatory")
+    @Column(nullable = false) 
     private String name;
     
+    // If the client does not provide an email, the server will return a VALIDATION error
     @NotBlank(message = "Email is mandatory")
+    // But if the line above was not present, the following error would be thrown to the terminal:
+    // ERROR 189314 --- [nio-8080-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Column 'email' cannot be null
+    // And this because of the line below (nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     // standard constructors / setters / getters / toString
