@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("api/employees")
+@RequestMapping("api/v1/")
 public class EmployeeController {
 
     private EmployeeService employeeService;
@@ -24,7 +24,7 @@ public class EmployeeController {
     }
 
     // Build POST create Employee REST API
-    @PostMapping
+    @PostMapping("/employees")
     public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee){
         Employee savedEmployee = employeeService.createEmployee(employee);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
@@ -32,7 +32,7 @@ public class EmployeeController {
 
     // Build GET employee BY ID REST API
     // http://localhost:33060/api/employees/1 -> 1 == {id}
-    @GetMapping("{id}")
+    @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long employeeId){
         Employee employee = employeeService.getEmployeeById(employeeId);
         return new ResponseEntity<>(employee, HttpStatus.OK);
@@ -40,7 +40,7 @@ public class EmployeeController {
 
     // Build GET ALL Employees REST API
     // http://localhost:33060/api/employees
-    @GetMapping
+    @GetMapping("/employees")
     public ResponseEntity<?> getAllEmployees(@RequestParam(name = "email", required = false) String email) {
         if (email != null) {
             Employee employee = employeeService.getEmployeeByEmail(email);
@@ -52,7 +52,7 @@ public class EmployeeController {
 
     // Build PUT Update Employee REST API
     // http://localhost:33060/api/employees/1
-    @PutMapping("{id}")
+    @PutMapping("/employees/{id}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long employeeId, @RequestBody Employee employee) {
         // Set the id of the employee object to the employeeId so that the service can update the employee with the given id, searching for it
         employee.setId(employeeId);
@@ -61,7 +61,7 @@ public class EmployeeController {
     }
 
     // Build DELETE Employee REST API
-    @DeleteMapping("{id}")
+    @DeleteMapping("/employees/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId){
         employeeService.deleteEmployee(employeeId);
         return new ResponseEntity<>("Employee successfully deleted!", HttpStatus.OK);

@@ -1,7 +1,10 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+
+import ies.lab3.ex3.entity.Quote;
+import ies.lab3.ex3.repository.QuoteRepository;
 
 @Service
 public class QuoteServiceImpl implements QuoteService {
@@ -22,9 +25,8 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
     @Override
-    public List<Quote> getQuotesByMovie(String movieName) {
-        List<Quote> quotes = quoteRepository.findQuotesByMovie(movieName);
-        return quotes;
+    public List<Quote> getQuotesByMovieId(Long movieId) {
+        return quoteRepository.findByMovie_Id(movieId); // Fetch quotes by movieId
     }
     
     @Override

@@ -41,7 +41,7 @@
 
 Let me know if you need any further adjustments!
 
-## Lab3_2_c Answers
+## Lab3_1_c Answers
 
 ### 1. **The “UserController” class gets an instance of “userRepository” through its constructor; how is this new repository instantiated?**
    
@@ -346,11 +346,10 @@ public class Application {
 - We can now run the application by executing the `main()` method.
 
 ```bash
-mvn clean package
-mvn exec:java -Dexec.mainClass="ies.lab3.ex1.lab3_1.JpaApplication"
+mvn clean spring-boot:run 
 ```
 
-- The application will be available at `http://localhost:8080/index`. **In the exercise of the lab: `http://127.0.0.1:8080/api/employees`**
+- The application will be available at `http://localhost:8080/index`. **In the exercise of the lab: `http://127.0.0.1:8080/api/v1/employees`**
 - We should see a basic CRUD user dashboard with links for adding new entities and for editing and removing existing ones.
 
 
@@ -897,3 +896,6 @@ List<Movie> findMoviesByYear(@Param("year") String year);
 ```
 
 This way, you have control over the exact query, though it’s usually not necessary for simple lookups. 
+
+### For dockerization, use README.md of Lab 1.
+### For docker compose, see [Bezkoder](https://www.bezkoder.com/docker-compose-spring-boot-mysql/)

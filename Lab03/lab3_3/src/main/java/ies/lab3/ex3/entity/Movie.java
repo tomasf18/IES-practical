@@ -1,9 +1,13 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.entity;
 
 import jakarta.persistence.Table;
+
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 public class Movie {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @NotBlank(message = "Title is mandatory")
@@ -24,7 +28,10 @@ public class Movie {
     @Column(nullable = false)
     private String year;
 
-    // standard constructors / setters / getters / toString
+    @OneToMany(mappedBy = "movie")
+    private List<Quote> quotes;
+
+    // Atandard constructors / setters / getters / toString
     public Movie() {
     }
 

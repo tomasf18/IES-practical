@@ -1,6 +1,8 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.service;
 
 import java.util.List;
+
+import ies.lab3.ex3.entity.Movie;
 
 public interface MovieService {
     Movie createMovie(Movie movie);

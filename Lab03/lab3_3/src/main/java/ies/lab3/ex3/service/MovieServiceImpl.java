@@ -1,7 +1,10 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+
+import ies.lab3.ex3.entity.Movie;
+import ies.lab3.ex3.repository.MovieRepository;
 
 @Service
 public class MovieServiceImpl implements MovieService {

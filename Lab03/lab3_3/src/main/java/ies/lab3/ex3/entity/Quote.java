@@ -1,11 +1,12 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.entity;
 
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity 
@@ -13,22 +14,22 @@ import jakarta.validation.constraints.NotBlank;
 public class Quote {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     
     @NotBlank(message = "Quote is mandatory")
-    @Column(nullable = false, unique = true)
     private String quote;
 
-    @NotBlank(message = "Movie is mandatory")
-    @Column(nullable = false) 
-    private String movie;
+    // Define the Many-to-One relationship with Movie
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "movie_id", nullable = false)  // Specifies the foreign key column for the relationship
+    private Movie movie;
 
-    // standard constructors / setters / getters / toString
+    // Constructors, getters, setters, and toString
     public Quote() {
     }
 
-    public Quote(String quote, String movie) {
+    public Quote(String quote, Movie movie) {
         this.quote = quote;
         this.movie = movie;
     }
@@ -49,11 +50,11 @@ public class Quote {
         this.quote = quote;
     }
 
-    public String getMovie() {
+    public Movie getMovie() {
         return movie;
     }
 
-    public void setMovie(String movie) {
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
     

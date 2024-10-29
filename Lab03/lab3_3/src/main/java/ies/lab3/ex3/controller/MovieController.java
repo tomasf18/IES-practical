@@ -1,4 +1,4 @@
-package ies.lab3.ex3;
+package ies.lab3.ex3.controller;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ies.lab3.ex3.entity.Movie;
+import ies.lab3.ex3.service.MovieService;
+
 @Controller
-@RequestMapping("api/movies")
+@RequestMapping("api/v1/movies")
 public class MovieController {
 
     private MovieService movieService;

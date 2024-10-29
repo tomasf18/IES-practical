@@ -3,7 +3,7 @@ services:
     depends_on:
       - mysqldb
     build: 
-      context: .
+      context: ./lab3_3
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
@@ -19,28 +19,3 @@ services:
     ports:
       - "33060:3306"
     restart: on-failure
-
-# version: '3.8'
-
-# services:
-#   app_container:
-#     depends_on:
-#       - mysqldb               # wait for the database to be ready
-#     platform: linux/x86_64    # use the linux platform
-#     build: 
-#       context: ./lab3_3       # use the current directory
-#       dockerfile: Dockerfile  # use the Dockerfile in the current directory (build the image)
-#     ports:
-#       - "8080:8080"           # map the port 8080 of the container to the port 8080 of the host
-#     restart: on-failure       # restart the container if it fails
-
-#   mysqldb:
-#     image: mysql/mysql-server:5.7   # use the MySQL image 
-#     environment:
-#       MYSQL_ROOT_PASSWORD: secret1  # set the root password
-#       MYSQL_DATABASE: demo          # create a database named demo
-#       MYSQL_USER: demo              # create a user named demo
-#       MYSQL_PASSWORD: secret2       # set the password for the user demo
-#     ports:
-#       - "33060:3306"
-#     restart: on-failure
