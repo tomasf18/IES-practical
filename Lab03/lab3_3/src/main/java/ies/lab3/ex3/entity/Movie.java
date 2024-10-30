@@ -16,8 +16,8 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "movies")
 public class Movie {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id // primary key
+    @GeneratedValue(strategy = GenerationType.AUTO) // auto increment column
     private long id;
 
     @NotBlank(message = "Title is mandatory")

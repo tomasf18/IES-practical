@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import ies.lab3.ex3.dto.QuoteRequest;
 import ies.lab3.ex3.entity.Movie;
 import ies.lab3.ex3.entity.Quote;
-import ies.lab3.ex3.repository.MovieRepository;
 import ies.lab3.ex3.service.QuoteService;
 
 @Controller
@@ -25,22 +24,20 @@ import ies.lab3.ex3.service.QuoteService;
 public class QuoteController {
 
     private QuoteService quoteService;
-    private MovieRepository movieRepository;
 
-    public QuoteController(QuoteService quoteService, MovieRepository movieRepository) {
+    public QuoteController(QuoteService quoteService) {
         this.quoteService = quoteService;
-        this.movieRepository = movieRepository;
     }
 
     @PostMapping("/quotes")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createQuote(@RequestBody QuoteRequest quoteRequest) {
         try {
-            // Retrieve the Movie entity using movieId
-            Movie movie = movieRepository.findById(quoteRequest.getMovieId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + quoteRequest.getMovieId()));
+            Movie movie = quoteService.getMovieById(quoteRequest.getMovieId());
+            if (movie == null) {
+                throw new IllegalArgumentException("Invalid movieId: " + quoteRequest.getMovieId());
+            }
 
-            // Create the new Quote entity and save it
             Quote quote = new Quote(quoteRequest.getQuote(), movie);
             Quote savedQuote = quoteService.createQuote(quote);
 
@@ -85,13 +82,15 @@ public class QuoteController {
             if (existingQuote == null) {
                 return new ResponseEntity<>("Quote not found", HttpStatus.NOT_FOUND);
             }
-    
-            Movie movie = movieRepository.findById(quoteRequest.getMovieId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid movieId: " + quoteRequest.getMovieId()));
-    
+
+            Movie movie = quoteService.getMovieById(quoteRequest.getMovieId());
+            if (movie == null) {
+                throw new IllegalArgumentException("Invalid movieId: " + quoteRequest.getMovieId());
+            }
+
             existingQuote.setQuote(quoteRequest.getQuote());
             existingQuote.setMovie(movie);
-    
+
             Quote updatedQuote = quoteService.updateQuote(existingQuote);
             return new ResponseEntity<>(updatedQuote, HttpStatus.OK);
         } catch (IllegalArgumentException e) {

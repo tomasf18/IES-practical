@@ -35,7 +35,13 @@
             - [Optional Request Parameters](#optional-request-parameters)
             - [A Default Value for the Request Parameter](#a-default-value-for-the-request-parameter)
             - [Mapping All Parameters](#mapping-all-parameters)
-            - [Mapping a Multi-Value Parameter](#mapping-a-multi-value-parameter)  
+            - [Mapping a Multi-Value Parameter](#mapping-a-multi-value-parameter) 
+   4. [Wrapping-Up And Integrating Concepts](#wrapping-up-and-integrating-concepts) 
+        - [Question](#question) 
+        - [Answer](#answer)
+        - [Notes](#notes) 
+   5. [References](#references)
+
 
 ---
 
@@ -825,7 +831,7 @@ http://localhost:8080/spring-mvc-basics/api/foos?id=1&id=2
 IDs are [1,2]
 ```
 
-## Wrapping-up and integrating concepts 
+## Wrapping-Up And Integrating Concepts 
 
 ### **Question**
 
@@ -861,6 +867,9 @@ In Spring Data JPA, the repository method naming convention is key. The method `
 3. **Dynamic Query Generation**:
    - Spring Data JPA translates `findMoviesByYear` into a query like `SELECT m FROM Movie m WHERE m.year = :year`, where `:year` is the method parameter.
    - This dynamic query generation allows you to use simple methods in the repository interface without writing explicit query code.
+
+
+### Notes
 
 #### Example
 
@@ -899,3 +908,16 @@ This way, you have control over the exact query, though it’s usually not neces
 
 ### For dockerization, use README.md of Lab 1.
 ### For docker compose, see [Bezkoder](https://www.bezkoder.com/docker-compose-spring-boot-mysql/)
+
+
+## References
+
+- [Baeldung - Accessing Databases In SpringBoot](https://www.baeldung.com/spring-boot-crud-thymeleaf)
+- [Hibernate 5 with Spring](https://www.baeldung.com/hibernate-spring)
+- [Tutorial on Bean Validation](https://www.baeldung.com/?__im-QylvkzKT=13326264676159996055)
+- [JavaGuides - Spring Boot 2 JPA MySQL CRUD Example](https://www.javaguides.net/2018/09/spring-boot-2-jpa-mysql-crud-example.html)
+- [Baeldung - Spring @RequestParam Annotation](https://www.baeldung.com/spring-request-param)
+- [Spring Data JPA - Create Simple Queries](https://spring.io/guides/gs/accessing-data-jpa#_create_simple_queries)
+- [Spring Data JPA - Repository Query Methods](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.details)
+- [Spring Data JPA - Query Creation](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)
+- [Spring Data JPA - Query Methods](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.query-creation)
