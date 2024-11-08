@@ -1,13 +1,12 @@
-import './App.css'
-import Fetch from './components/Fetch'
-
+import "./App.css";
+import Axios from "./components/Axios";
 
 function App() {
-  return (
-    <>
-      <Fetch />
-    </>
-  )
+    return (
+        <>
+            <Axios />
+        </>
+    );
 }
 
-export default App
+export default App;
