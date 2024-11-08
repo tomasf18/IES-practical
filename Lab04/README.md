@@ -8,20 +8,49 @@
 
 ## Table of Contents
 
+1. [ReactJS + Vite](#reactjs--vite)
+  - [Create project](#create-project)
+  - [Install Dependencies](#install-dependencies)
+  - [Run Project](#run-project)
+2. [First Dummy App - Quick Start](#first-dummy-app---quick-start)
+  - [Creating and nesting components](#creating-and-nesting-components)
+  - [Writing markup with JSX](#writing-markup-with-jsx)
+  - [Adding styles](#adding-styles)
+  - [Conditional rendering](#conditional-rendering)
+  - [Rendering lists](#rendering-lists)
+  - [Responding to events](#responding-to-events)
+  - [Updating the screen](#updating-the-screen)
+  - [Using Hooks](#using-hooks)
+  - [Sharing data between components](#sharing-data-between-components)
+3. [Props and States](#props-and-states)
+  - [Passing Props to a Component](#passing-props-to-a-component)
+  - [Updating Objects in State](#updating-objects-in-state)
+  - [Passing Data Deeply with Context](#passing-data-deeply-with-context)
 
 
 
-## Create React App
+
+## ReactJS + Vite
+
+### Create project
 
 ```bash
-npx create-react-app my-app
-cd my-app
-npm start
+npm create vite@latest
 ```
 
-- When you’re ready to deploy to production, running `npm run build` will create an optimized build of your app in the `build` folder.
+### Install Dependencies
 
-## Quick Start
+```bash
+npm install
+```
+
+### Run Project
+
+```bash
+npm run dev
+```
+
+## First Dummy App - [Quick Start](https://react.dev/learn)
 
 ### Creating and nesting components 
 
@@ -54,7 +83,7 @@ export default function MyApp() {
 
 ### Writing markup with JSX 
 - The markup syntax JSX is optional, but most React projects use JSX for its convenience.
-- In JSX the components can’t return multiple JSX tags; you have to wrap them into a shared parent, like a <div>...</div> or an empty <>...</> wrapper (a fragment).
+- In JSX the components can’t return multiple JSX tags; you have to wrap them into a shared parent, like a `<div>...</div>` or an empty `<>...</>` wrapper (a fragment).
 
 ### Adding styles 
 - You can specify a CSS class with `className`; it works the same way as the HTML `class` attribute
@@ -205,7 +234,7 @@ function MyButton() {
 - Now when you click either button, the count in `MyApp` will change,**which will change both of the counts in `MyButton`**. 
 
 - As you can see: pass the state down from `MyApp` to each `MyButton`, **together with the shared click handler**. 
-- You can pass information to `MyButton` using the JSX curly braces, just like you previously did with built-in tags like <img>
+- You can pass information to `MyButton` using the JSX curly braces, just like you previously did with built-in tags like `<img>`
 
 - The information you pass down like this is called `props`. 
 - Now the `MyApp` component **contains the count state and the handleClick event handler, and passes both of them down as props to each of the buttons**.
@@ -243,5 +272,812 @@ function MyButton() {
 
 }
 ```
+
+
+
+## Props and States
+
+### [Passing Props to a Component](https://react.dev/learn/passing-props-to-a-component)
+
+
+#### Familiar props
+
+- **Props** are the information that you pass to a JSX tag. 
+- For example, `className`, `src`, `alt`, `width`, and `height` are some of the props you can pass to an `<img>`:
+
+```tsx
+function Avatar() {
+  return (
+    <img
+      className="avatar"
+      src="https://i.imgur.com/1bX5QH6.jpg"
+      alt="Lin Lanying"
+      width={100}
+      height={100}
+    />
+  );
+}
+
+export default function Profile() {
+  return (
+    <Avatar />
+  );
+}
+```
+
+#### Passing props to a component 
+
+1. First, pass some props to `Avatar`. 
+  - For example, let’s pass two props: person (`an object`), and size (a number):
+
+```tsx
+export default function Profile() {
+  return (
+    <Avatar
+      person={{ name: 'Lin Lanying', imageId: '1bX5QH6' }}
+      size={100}
+    />
+  );
+}
+```
+
+**Note**: Remember that double braces after `person=` merely represents an **object** in the usual JSX curly braces.
+
+2. Read props inside the child component 
+
+- To read the props inside the `Avatar` component, you need to **declare a function with a parameter**.
+
+```tsx
+function Avatar({ person, size }) {
+  // person and size are available here
+}
+```
+
+- Using different props:
+
+```tsx
+import { getImageUrl } from './utils.js';
+
+function Avatar({ person, size }) {
+  return (
+    <img
+      className="avatar"
+      src={getImageUrl(person)}
+      alt={person.name}
+      width={size}
+      height={size}
+    />
+  );
+}
+
+export default function Profile() {
+  return (
+    <div>
+      <Avatar
+        size={100}
+        person={{ 
+          name: 'Katsuko Saruhashi', 
+          imageId: 'YfeOqp2'
+        }}
+      />
+      <Avatar
+        size={80}
+        person={{
+          name: 'Aklilu Lemma', 
+          imageId: 'OKS67lh'
+        }}
+      />
+      <Avatar
+        size={50}
+        person={{ 
+          name: 'Lin Lanying',
+          imageId: '1bX5QH6'
+        }}
+      />
+    </div>
+  );
+}
+```
+
+```tsx
+// props destructured in separate items
+function Avatar({ person, size }) {
+  // ...
+}
+
+// object props
+function Avatar(props) {
+  let person = props.person;
+  let size = props.size;
+  // ...
+}
+```
+
+#### Specifying a default value for a prop 
+
+```tsx
+function Avatar({ person, size = 100 }) {
+  // ...
+}
+```
+
+#### Forwarding props with the JSX spread syntax 
+
+- Sometimes, passing props gets very repetitive:
+
+```tsx
+function Profile({ person, size, isSepia, thickBorder }) {
+  return (
+    <div className="card">
+      <Avatar
+        person={person}
+        size={size}
+        isSepia={isSepia}
+        thickBorder={thickBorder}
+      />
+    </div>
+  );
+}
+```
+
+- To do this, you can use the **JSX spread syntax**.
+
+```tsx
+function Profile(props) {
+  return (
+    <div className="card">
+      <Avatar {...props} />
+    </div>
+  );
+}
+```
+
+#### Passing JSX as children 
+
+- It is common to nest built-in browser tags:
+
+```tsx
+<div>
+  <img />
+</div>
+```
+
+Sometimes you’ll want to nest your own components the same way:
+
+```tsx
+<Card>
+  <Avatar />
+</Card>
+```
+
+- When you nest content inside a JSX tag, **the parent component will receive that content in a `prop` called children**. 
+- For example, the `Card` component below will receive a `children prop` set to `<Avatar />` and render it in a **wrapper div**:
+
+```tsx
+import Avatar from './Avatar.js';
+
+function Card({ children }) {
+  return (
+    <div className="card">
+      {children}
+    </div>
+  );
+}
+
+export default function Profile() {
+  return (
+    <Card>
+      <Avatar
+        size={100}
+        person={{ 
+          name: 'Katsuko Saruhashi',
+          imageId: 'YfeOqp2'
+        }}
+      />
+    </Card>
+  );
+}
+```
+
+- Try replacing the `<Avatar>` inside `<Card>` with some `text` to see how the Card component can wrap any nested content. 
+- **It doesn’t need to “know” what’s being rendered inside of it**. 
+- You can think of a component with a children prop as having a “hole” that can be “filled in” by its parent components with arbitrary JSX 
+- Examples of use: panels, grids, etc.
+
+![](./images/img5.png)
+
+
+#### How props change over time 
+
+- **A component may receive different props over time.** 
+- Props are not always **static**! 
+- Props reflect a component’s data at any point in time, rather than only in the beginning.
+- However, props are immutable.
+- When you need to **respond to the user input** (like changing the selected color), you will need to “`set state`”.
+
+
+
+### [Updating Objects in State](https://react.dev/learn/updating-objects-in-state)
+
+#### What’s a mutation? 
+
+```tsx
+const [position, setPosition] = useState({ x: 0, y: 0 });
+```
+
+- It is possible to change the contents of the object itself. This is called a **mutation**:
+
+```tsx
+position.x = 5;
+position.y = 0;
+```
+
+- But to actually change and render the state of a component, you need to call the `setPosition` function:
+
+```tsx
+setPosition({ x: 5, y: 0 });
+```
+
+- With setPosition, you’re telling React:
+  - Replace `position` with this new object
+  - And **render this component again**
+
+- The following code creates a red dot that moves according to the cursor:
+
+```tsx
+import { useState } from 'react';
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com'
+  });
+
+  function handleFirstNameChange(e) {
+    person.firstName = e.target.value;
+  }
+
+  function handleLastNameChange(e) {
+    person.lastName = e.target.value;
+  }
+
+  function handleEmailChange(e) {
+    person.email = e.target.value;
+  }
+
+  return (
+    <>
+      <label>
+        First name:
+        <input
+          value={person.firstName}
+          onChange={handleFirstNameChange}
+        />
+      </label>
+      <label>
+        Last name:
+        <input
+          value={person.lastName}
+          onChange={handleLastNameChange}
+        />
+      </label>
+      <label>
+        Email:
+        <input
+          value={person.email}
+          onChange={handleEmailChange}
+        />
+      </label>
+      <p>
+        {person.firstName}{' '}
+        {person.lastName}{' '}
+        ({person.email})
+      </p>
+    </>
+  );
+}
+```
+
+#### Copying objects with the spread syntax
+
+- Analyze the following code:
+
+```tsx
+import { useState } from 'react';
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    firstName: 'Barbara',
+    lastName: 'Hepworth',
+    email: 'bhepworth@sculpture.com'
+  });
+
+  function handleFirstNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      firstName: e.target.value
+    });
+  }
+
+  function handleLastNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      lastName: e.target.value
+    });
+  }
+
+  function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      email: e.target.value
+    });
+  }
+
+  return (
+    <>
+      <label>
+        First name:
+        <input
+          value={person.firstName}
+          onChange={handleFirstNameChange}
+        />
+      </label>
+      <label>
+        Last name:
+        <input
+          value={person.lastName}
+          onChange={handleLastNameChange}
+        />
+      </label>
+      <label>
+        Email:
+        <input
+          value={person.email}
+          onChange={handleEmailChange}
+        />
+      </label>
+      <p>
+        {person.firstName}{' '}
+        {person.lastName}{' '}
+        ({person.email})
+      </p>
+    </>
+  );
+}
+```
+
+- **The spread syntax** (`...person`) creates a new object with all the properties of the `person` object.
+- Then you can **overwrite** the property you want to change.
+- **This way, you’re not mutating the original object**.
+- **You’re creating a new object with the same properties, except for the one you want to change**.
+- **This is the recommended way to update objects in state**.
+- Notice how you didn’t declare a **separate state variable for each input field**. 
+- For large forms, keeping all data grouped in an object is very convenient - as long as you update it correctly!
+
+
+#### Updating a nested object
+
+- Consider a nested object structure like this:
+
+```tsx
+const [person, setPerson] = useState({
+  name: 'Niki de Saint Phalle',
+  artwork: {
+    title: 'Blue Nana',
+    city: 'Hamburg',
+    image: 'https://i.imgur.com/Sd1AgUOm.jpg',
+  }
+});
+```
+
+- If you wanted to update person.artwork.city: 
+
+```tsx
+setPerson({
+  ...person,            // Copy other fields
+  artwork: {            // but replace the artwork
+    ...person.artwork,  // with the same one
+    city: 'New Delhi'   // but in New Delhi!
+  }
+});
+```
+
+```tsx
+import { useState } from 'react';
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    name: 'Niki de Saint Phalle',
+    artwork: {
+      title: 'Blue Nana',
+      city: 'Hamburg',
+      image: 'https://i.imgur.com/Sd1AgUOm.jpg',
+    }
+  });
+
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      name: e.target.value
+    });
+  }
+
+  function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        title: e.target.value
+      }
+    });
+  }
+
+  function handleCityChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        city: e.target.value
+      }
+    });
+  }
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        image: e.target.value
+      }
+    });
+  }
+
+  return (
+    <>
+      <label>
+        Name:
+        <input
+          value={person.name}
+          onChange={handleNameChange}
+        />
+      </label>
+      <label>
+        Title:
+        <input
+          value={person.artwork.title}
+          onChange={handleTitleChange}
+        />
+      </label>
+      <label>
+        City:
+        <input
+          value={person.artwork.city}
+          onChange={handleCityChange}
+        />
+      </label>
+      <label>
+        Image:
+        <input
+          value={person.artwork.image}
+          onChange={handleImageChange}
+        />
+      </label>
+      <p>
+        <i>{person.artwork.title}</i>
+        {' by '}
+        {person.name}
+        <br />
+        (located in {person.artwork.city})
+      </p>
+      <img 
+        src={person.artwork.image} 
+        alt={person.artwork.title}
+      />
+    </>
+  );
+}
+```
+
+### [Passing Data Deeply with Context](https://react.dev/learn/passing-data-deeply-with-context)
+
+- Usually, you will pass information **from a parent** component **to a child** component **via props**. 
+- But passing props can become verbose and inconvenient **if you have to pass them through many components in the middle**, or **if many components in your app need the same information**. 
+- **`Context`** **lets the parent component make some information available to any component in the tree below it** - no matter how deep - **without passing it explicitly through props**.
+
+
+Lifting state up:
+![](./images/img6.webp)
+
+Prop drilling:
+![](./images/img7.webp)
+
+
+#### Context: an alternative to passing props
+
+- Consider this `Heading` component that accepts a level for its size:
+
+```tsx
+import Heading from './Heading.js';
+import Section from './Section.js';
+
+export default function Page() {
+  return (
+    <Section>
+      <Heading level={1}>Title</Heading>
+      <Heading level={2}>Heading</Heading>
+      <Heading level={3}>Sub-heading</Heading>
+      <Heading level={4}>Sub-sub-heading</Heading>
+      <Heading level={5}>Sub-sub-sub-heading</Heading>
+      <Heading level={6}>Sub-sub-sub-sub-heading</Heading>
+    </Section>
+  );
+}
+```
+
+```tsx
+export default function Heading({ level, children }) {
+  switch (level) {
+    case 1:
+      return <h1>{children}</h1>;
+    case 2:
+      return <h2>{children}</h2>;
+    case 3:
+      return <h3>{children}</h3>;
+    case 4:
+      return <h4>{children}</h4>;
+    case 5:
+      return <h5>{children}</h5>;
+    case 6:
+      return <h6>{children}</h6>;
+    default:
+      throw Error('Unknown level: ' + level);
+  }
+}
+```
+
+- Let’s say you want **multiple headings** within the same `Section` to always have the same size:
+
+```tsx
+import Heading from './Heading.js';
+import Section from './Section.js';
+
+export default function Page() {
+  return (
+    <Section>
+      <Heading level={1}>Title</Heading>
+      <Section>
+        <Heading level={2}>Heading</Heading>
+        <Heading level={2}>Heading</Heading>
+        <Heading level={2}>Heading</Heading>
+        <Section>
+          <Heading level={3}>Sub-heading</Heading>
+          <Heading level={3}>Sub-heading</Heading>
+          <Heading level={3}>Sub-heading</Heading>
+          <Section>
+            <Heading level={4}>Sub-sub-heading</Heading>
+            <Heading level={4}>Sub-sub-heading</Heading>
+            <Heading level={4}>Sub-sub-heading</Heading>
+          </Section>
+        </Section>
+      </Section>
+    </Section>
+  );
+}
+```
+
+- Currently, you pass the level prop to each `<Heading>` separately
+- It would be nice if you could pass the level prop to the `<Section>` component instead and remove it from the `<Heading>`.
+- **But how can the `<Heading>` component know the level of its closest `<Section>`?** 
+- **That would require some way for a child to “ask” for data from somewhere above in the tree.**
+- You can’t do it with props alone. 
+
+- **This is where context comes into play**: 
+  1. **`Create`** a context. (You can call it `LevelContext`, since it’s for the heading level.)
+  2. **`Use`** that context from the component that needs the data. (`Heading` will use `LevelContext`.)
+  3. **`Provide`** that context from the component that specifies the data. (`Section` will provide `LevelContext`.)
+
+
+Using context in close children:
+![](./images/img8.webp)
+
+Using context in distant children:
+![](./images/img9.webp)
+
+##### Step 1: Create the context 
+
+```tsx
+import { createContext } from 'react';
+
+export const LevelContext = createContext(1);
+```
+
+- The only argument to createContext is the *default value*. 
+
+##### Step 2: Use the context
+
+```tsx
+import { useContext } from 'react';
+import { LevelContext } from './LevelContext.js';
+```
+
+- Currently, the `Heading` component reads level from `props`:
+
+```tsx
+export default function Heading({ level, children }) {
+  // ...
+}
+```
+
+- Instead, remove the `level` prop and **read the value from the context** you just imported, `LevelContext`:
+
+```tsx
+export default function Heading({ children }) {
+  const level = useContext(LevelContext);
+  // ...
+}
+```
+
+- Notice this example doesn’t quite work, yet! 
+- All the headings have the same size because even though you’re **`using`** the context, you have not **`provided`** it yet. 
+- **React doesn’t know where to get it!**
+
+- **If you don’t provide the context, React will use the default value you’ve specified in the previous step.** 
+- In this example, you specified 1 as the argument to createContext, so useContext(LevelContext) returns 1, setting all those headings to `<h1>`. 
+- **Let’s fix this problem by having `each Section provide its own context`.**
+
+##### Step 3: Provide the context
+
+- The `Section` component currently renders its children:
+
+```tsx
+export default function Section({ children }) {
+  return (
+    <section className="section">
+      {children}
+    </section>
+  );
+}
+```
+
+- **Wrap them with a context provider** to provide the `LevelContext` to them:
+
+```tsx
+import { LevelContext } from './LevelContext.js';
+
+export default function Section({ level, children }) {
+  return (
+    <section className="section">
+      <LevelContext.Provider value={level}>
+        {children}
+      </LevelContext.Provider>
+    </section>
+  );
+}
+```
+
+- This tells React: “if any component inside this `<Section>` asks for LevelContext, give them this level.” 
+- The component will use the value of the nearest `<LevelContext.Provider>` in the UI tree above it.
+
+```tsx
+import Heading from './Heading.js';
+import Section from './Section.js';
+
+export default function Page() {
+  return (
+    <Section level={1}>
+      <Heading>Title</Heading>
+      <Section level={2}>
+        <Heading>Heading</Heading>
+        <Heading>Heading</Heading>
+        <Heading>Heading</Heading>
+        <Section level={3}>
+          <Heading>Sub-heading</Heading>
+          <Heading>Sub-heading</Heading>
+          <Heading>Sub-heading</Heading>
+          <Section level={4}>
+            <Heading>Sub-sub-heading</Heading>
+            <Heading>Sub-sub-heading</Heading>
+            <Heading>Sub-sub-heading</Heading>
+          </Section>
+        </Section>
+      </Section>
+    </Section>
+  );
+}
+```
+
+```tsx
+import { useContext } from 'react';
+import { LevelContext } from './LevelContext.js';
+
+export default function Heading({ children }) {
+  // Ask for the level from the nearest LevelContext.Provider
+  const level = useContext(LevelContext);
+  switch (level) {
+    case 1:
+      return <h1>{children}</h1>;
+    case 2:
+      return <h2>{children}</h2>;
+    case 3:
+      return <h3>{children}</h3>;
+    case 4:
+      return <h4>{children}</h4>;
+    case 5:
+      return <h5>{children}</h5>;
+    case 6:
+      return <h6>{children}</h6>;
+    default:
+      throw Error('Unknown level: ' + level);
+  }
+}
+```
+
+#### Using and providing context from the same component 
+
+- Currently, you still have to specify each section’s level manually
+- Since context lets you read information from a component above, each `Section` could read the level from the `Section` above, and pass `level + 1` down automatically:
+
+```tsx
+import { useContext } from 'react';
+import { LevelContext } from './LevelContext.js';
+
+export default function Section({ children }) {
+  const level = useContext(LevelContext);
+  return (
+    <section className="section">
+      <LevelContext.Provider value={level + 1}>
+        {children}
+      </LevelContext.Provider>
+    </section>
+  );
+}
+```
+
+```tsx
+import Heading from './Heading.js';
+import Section from './Section.js';
+
+export default function Page() {
+  return (
+    <Section>
+      <Heading>Title</Heading>
+      <Section>
+        <Heading>Heading</Heading>
+        <Heading>Heading</Heading>
+        <Heading>Heading</Heading>
+        <Section>
+          <Heading>Sub-heading</Heading>
+          <Heading>Sub-heading</Heading>
+          <Heading>Sub-heading</Heading>
+          <Section>
+            <Heading>Sub-sub-heading</Heading>
+            <Heading>Sub-sub-heading</Heading>
+            <Heading>Sub-sub-heading</Heading>
+          </Section>
+        </Section>
+      </Section>
+    </Section>
+  );
+}
+```
+
+- Now both `Heading` and `Section` read the `LevelContext` **to figure out how “deep” they are**. 
+
+
+#### Context passes through intermediate components 
+
+- You can insert as many components as you like between the component that provides context and the one that uses it. 
+- This includes both `built-in` components like `<div>` and components you might build yourself.
+- **Context lets you write components that “adapt to their surroundings” and display themselves differently depending on where (or, in other words, `in which context`) they are being rendered.**
+
+
+#### Before you use context 
+
+- Context is very tempting to use! 
+- However, this also means it’s too easy to overuse it. 
+- **Just because you need to pass some props several levels deep doesn’t mean you should put that information into context**.
+  1. **Start by passing props.**
+  2. **Extract components and pass JSX as children to them.**
 
 
