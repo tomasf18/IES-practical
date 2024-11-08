@@ -1081,3 +1081,169 @@ export default function Page() {
   2. **Extract components and pass JSX as children to them.**
 
 
+## [Consume REST API services](https://www.freecodecamp.org/news/how-to-consume-rest-apis-in-react/)
+
+- To consume REST APIs in React, we can use either the `Fetch API` or `Axios`.
+
+### Using Fetch API
+
+- The code of ex3 (part1) uses the `fetch` API to interact with a placeholder API (`jsonplaceholder.typicode.com`) that simulates a REST API for demonstration purposes.
+
+#### Fetching Data in `useEffect`
+- In the `useEffect` hook, a `fetchPost` function is defined and called immediately. 
+- This function fetches a list of posts:
+
+```javascript
+useEffect(() => {
+    const fetchPost = async () => {
+        try {
+            const response = await fetch(
+                "https://jsonplaceholder.typicode.com/posts?_limit=10"
+            );
+            const data = await response.json();
+            setPosts(data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    fetchPost();
+}, []);
+```
+
+- `fetch("https://jsonplaceholder.typicode.com/posts?_limit=10")`: Makes a GET request to the API endpoint to retrieve posts with a limit of 10.
+- `await response.json()`: Parses the JSON response data and assigns it to `data`.
+- `setPosts(data)`: Updates the `posts` state with the fetched data.
+- This function is only run once when the component mounts, as indicated by the empty dependency array `[]` in `useEffect`.
+
+- In this exercise, we've seen how to make fetch requests normally using the promise syntax, which can be confusing at times. 
+- Then comes the chaining. **We can avoid the .then() chaining by using async/await** and write more readable code.
+- To use `async/await`, first call `async` in the function. 
+- Then, when making a request and expecting a response, add the `await` syntax in front of the function **to wait until the promise settles with the result**.
+
+#### 2. Deleting a Post with `fetch`
+- The `deletePost` function is used to delete a post by its `id`:
+
+```javascript
+const deletePost = async (id: number) => {
+    let response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts/${id}`,
+        {
+            method: "DELETE",
+        }
+    );
+    if (response.status === 200) {
+        setPosts(
+            posts.filter((post) => {
+                return post.id !== id;
+            })
+        );
+    } else {
+        return;
+    }
+};
+```
+
+- `fetch(..., { method: "DELETE" })`: Sends a DELETE request to the API endpoint with the specified post `id`.
+- `if (response.status === 200)`: Checks if the deletion was successful.
+- `setPosts(posts.filter((post) => post.id !== id))`: Updates the `posts` state by removing the deleted post.
+
+#### 3. Adding a New Post with `fetch`
+- The `addPosts` function allows to add a new post with a title and body:
+
+```javascript
+const addPosts = async (title: string, body: string) => {
+    let response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                title: title,
+                body: body,
+                userId: Math.random().toString(36).slice(2),
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+            },
+        }
+    );
+    let data = await response.json();
+    setPosts((posts) => [data, ...posts]);
+    setTitle("");
+    setBody("");
+};
+```
+
+- `fetch(..., { method: "POST", body, headers })`: Sends a POST request to create a new post.
+    - `method: "POST"`: Specifies that this is a POST request.
+    - `body: JSON.stringify(...)`: Converts the post details (title, body, userId) into a JSON string to send in the request.
+    - `headers`: Specifies the content type as JSON.
+- `let data = await response.json()`: Parses the response to get the created post data.
+- `setPosts((posts) => [data, ...posts])`: Adds the new post to the beginning of the `posts` list.
+
+
+### 2. Using Axiosbody
+
+- Axios is a popular third-party library for making **HTTP requests**. 
+- It simplifies syntax and **automatically parses JSON responses**.
+
+1. **Install Axios:**
+
+- **Axios**, unlike the Fetch API, **is not built-in**, so we will need to incorporate it into our project in order to use it.
+
+   ```bash
+   npm install axios
+   ```
+
+2. **Use Axios in `useEffect`:**
+   ```javascript
+   import axios from 'axios';
+
+   useEffect(() => {
+     axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
+       .then(response => setPosts(response.data))
+       .catch(err => console.error(err));
+   }, []);
+   ```
+
+3. **Using Axios for POST and DELETE Requests:**
+
+To add a new post:
+```javascript
+const addPost = async (title, body) => {
+  await axios.post('https://jsonplaceholder.typicode.com/posts', {
+    title,
+    body,
+    userId: 1,
+  }).then(response => setPosts([response.data, ...posts]));
+};
+```
+
+To delete a post:
+```javascript
+const deletePost = async (id) => {
+  await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`)
+    .then(() => setPosts(posts.filter(post => post.id !== id)));
+};
+```
+
+### Error Handling
+
+Both Fetch and Axios allow for error handling. With Fetch, check `response.ok` to catch errors:
+```javascript
+fetch('https://jsonplaceholder.typicode.com/posts')
+  .then(response => {
+    if (!response.ok) throw Error('Error fetching data');
+    return response.json();
+  })
+  .catch(err => console.error(err));
+```
+
+With Axios, errors can be caught directly in `.catch()`:
+```javascript
+axios.get('https://jsonplaceholder.typicode.com/posts')
+  .catch(err => console.error(err.message));
+```
+
+### Summary
+Both the Fetch API and Axios offer effective ways to consume APIs in React. Fetch is native to JavaScript, while Axios is an external library with a simpler syntax.
