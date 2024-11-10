@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:8080/api/v1";
+import AxiosInstance from './AxiosInstance';
 
 interface Movie {
     id: string;
@@ -14,14 +12,54 @@ interface MovieCreate {
 }
 
 export const MovieService = {
-    createMovie: (movie: MovieCreate) =>
-        axios.post(`${API_BASE_URL}/movies`, movie),
-    getMovieById: (id: string) => axios.get(`${API_BASE_URL}/movies/${id}`),
-    getAllMovies: (year?: string) => {
-        const params = year ? { year } : {};
-        return axios.get(`${API_BASE_URL}/movies`, { params });
+    createMovie: async (movie: MovieCreate) => {
+        try {
+            const response = await AxiosInstance.post<Movie>('/movies', movie);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating movie:', error);
+            throw error;
+        }
     },
-    updateMovie: (id: string, movie: Movie) =>
-        axios.put(`${API_BASE_URL}/movies/${id}`, movie),
-    deleteMovie: (id: string) => axios.delete(`${API_BASE_URL}/movies/${id}`),
+
+    getMovieById: async (id: string) => {
+        try {
+            const response = await AxiosInstance.get<Movie>(`/movies/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching movie by ID:', error);
+            throw error;
+        }
+    },
+
+    getAllMovies: async (year?: string) => {
+        try {
+            const params = year ? { year } : {};
+            const response = await AxiosInstance.get<Movie[]>('/movies', { params });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching movies:', error);
+            throw error;
+        }
+    },
+
+    updateMovie: async (id: string, movie: Movie) => {
+        try {
+            const response = await AxiosInstance.put<Movie>(`/movies/${id}`, movie);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating movie:', error);
+            throw error;
+        }
+    },
+
+    deleteMovie: async (id: string) => {
+        try {
+            await AxiosInstance.delete(`/movies/${id}`);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting movie:', error);
+            throw error;
+        }
+    },
 };

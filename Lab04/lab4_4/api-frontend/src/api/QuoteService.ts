@@ -1,6 +1,10 @@
-import axios from "axios";
+import AxiosInstance from './AxiosInstance';
 
-const API_BASE_URL = "http://localhost:8080/api/v1";
+interface Quote {
+    id: string;
+    quote: string;
+    movieId: string;
+}
 
 interface QuoteRequest {
     quote: string;
@@ -8,15 +12,64 @@ interface QuoteRequest {
 }
 
 export const QuoteService = {
-    createQuote: (quoteRequest: QuoteRequest) =>
-        axios.post(`${API_BASE_URL}/quotes`, quoteRequest),
-    getQuoteById: (id: string) => axios.get(`${API_BASE_URL}/quotes/${id}`),
-    getAllQuotes: (movieId?: string) => {
-        const params = movieId ? { movieId } : {};
-        return axios.get(`${API_BASE_URL}/quotes`, { params });
+    createQuote: async (quoteRequest: QuoteRequest) => {
+        try {
+            const response = await AxiosInstance.post<Quote>('/quotes', quoteRequest);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating quote:', error);
+            throw error;
+        }
     },
-    getRandomQuote: () => axios.get(`${API_BASE_URL}/quote`),
-    updateQuote: (id: string, quoteRequest: QuoteRequest) =>
-        axios.put(`${API_BASE_URL}/quotes/${id}`, quoteRequest),
-    deleteQuote: (id: string) => axios.delete(`${API_BASE_URL}/quotes/${id}`),
+
+    getQuoteById: async (id: string) => {
+        try {
+            const response = await AxiosInstance.get<Quote>(`/quotes/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching quote by ID:', error);
+            throw error;
+        }
+    },
+
+    getAllQuotes: async (movieId?: string) => {
+        try {
+            const params = movieId ? { movieId } : {};
+            const response = await AxiosInstance.get<Quote[]>('/quotes', { params });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching quotes:', error);
+            throw error;
+        }
+    },
+
+    getRandomQuote: async () => {
+        try {
+            const response = await AxiosInstance.get<Quote>('/quote');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching random quote:', error);
+            throw error;
+        }
+    },
+
+    updateQuote: async (id: string, quoteRequest: QuoteRequest) => {
+        try {
+            const response = await AxiosInstance.put<Quote>(`/quotes/${id}`, quoteRequest);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating quote:', error);
+            throw error;
+        }
+    },
+
+    deleteQuote: async (id: string) => {
+        try {
+            await AxiosInstance.delete(`/quotes/${id}`);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting quote:', error);
+            throw error;
+        }
+    },
 };

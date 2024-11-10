@@ -1,0 +1,90 @@
+/* Container styling */
+.container {
+    padding: 20px;
+}
+
+/* Two-column layout */
+.content {
+    display: flex;
+    gap: 200px; /* Space between columns */
+}
+
+/* Left column - Operations */
+.operations {
+    flex: 1; /* Takes up half the available width */
+    max-width: 400px; /* Adjust as needed for form width */
+}
+
+/* Right column - Movie list */
+.movieList {
+    width: 500px;
+}
+
+/* Right column - Quote list */
+.quoteList {
+    width: 500px;
+}
+/* Styling for header and subheaders */
+.header {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.subHeader {
+    font-size: 1.5rem;
+    margin-top: 20px;
+}
+
+/* Styling for inputs and buttons */
+.input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button {
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.cancelButton {
+    background-color: #dc3545;
+    margin-left: 10px;
+}
+
+.cancelButton:hover {
+    background-color: #c82333;
+}
+
+/* Movie list items */
+.listItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.actionButton {
+    margin-left: 5px;
+    padding: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.actionButton:hover {
+    background-color: #218838;
+}

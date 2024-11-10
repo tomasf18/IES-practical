@@ -1,172 +1,200 @@
-import { useEffect, useState } from 'react';
-import { MovieService } from '../api/MovieService';
+import { useEffect, useState } from "react";
+import { MovieService } from "../api/MovieService";
 
 interface Movie {
-  id: string;
-  title: string;
-  year: string;
+    id: string;
+    title: string;
+    year: string;
 }
 
 function MoviePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState('');
-  const [year, setYear] = useState('');
-  const [searchYear, setSearchYear] = useState('');
-  const [searchId, setSearchId] = useState('');
-  const [editMode, setEditMode] = useState(false);
-  const [editMovieId, setEditMovieId] = useState<string | null>(null);
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const [title, setTitle] = useState("");
+    const [year, setYear] = useState("");
+    const [searchYear, setSearchYear] = useState("");
+    const [searchId, setSearchId] = useState("");
+    const [editMode, setEditMode] = useState(false);
+    const [editMovieId, setEditMovieId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
-
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      const response = await MovieService.getAllMovies();
-      setMovies(response.data);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddMovie = async () => {
-    const newMovie = { title, year };
-    try {
-      await MovieService.createMovie(newMovie);
-      alert('Movie created successfully');
-      setTitle('');
-      setYear('');
-      fetchMovies();
-    } catch (error) {
-      console.error("Error creating movie:", error);
-      alert('Failed to create movie');
-    }
-  };
-
-  const handleEditMovie = async () => {
-    if (editMovieId) {
-      const updatedMovie = { id: editMovieId, title, year };
-      try {
-        await MovieService.updateMovie(editMovieId, updatedMovie);
-        alert('Movie updated successfully');
-        setEditMode(false);
-        setEditMovieId(null);
-        setTitle('');
-        setYear('');
+    useEffect(() => {
         fetchMovies();
-      } catch (error) {
-        console.error("Error updating movie:", error);
-        alert('Failed to update movie');
-      }
-    }
-  };
+    }, []);
 
-  const handleDeleteMovie = async (id: string) => {
-    try {
-      await MovieService.deleteMovie(id);
-      alert('Movie deleted successfully');
-      fetchMovies();
-    } catch (error) {
-      console.error("Error deleting movie:", error);
-      alert('Failed to delete movie');
-    }
-  };
+    const fetchMovies = async () => {
+        try {
+            const movies = await MovieService.getAllMovies();
+            setMovies(movies);
+        } catch (error) {
+            console.error("Error fetching movies:", error);
+        }
+    };
 
-  const handleSearchById = async () => {
-    try {
-      const response = await MovieService.getMovieById(searchId);
-      setMovies([response.data]);
-    } catch (error) {
-      console.error("Error searching movie by ID:", error);
-      alert('Failed to find movie by ID');
-    }
-  };
+    const handleAddMovie = async () => {
+        const newMovie = { title, year };
+        try {
+            await MovieService.createMovie(newMovie);
+            alert("Movie created successfully");
+            setTitle("");
+            setYear("");
+            fetchMovies();
+        } catch (error) {
+            console.error("Error creating movie:", error);
+            alert("Failed to create movie");
+        }
+    };
 
-  const handleFilterByYear = async () => {
-    try {
-      const response = await MovieService.getAllMovies(searchYear);
-      setMovies(response.data);
-    } catch (error) {
-      console.error("Error filtering movies by year:", error);
-      alert('Failed to filter movies');
-    }
-  };
+    const handleEditMovie = async () => {
+        if (editMovieId) {
+            const updatedMovie = { id: editMovieId, title, year };
+            try {
+                await MovieService.updateMovie(editMovieId, updatedMovie);
+                alert("Movie updated successfully");
+                setEditMode(false);
+                setEditMovieId(null);
+                setTitle("");
+                setYear("");
+                fetchMovies();
+            } catch (error) {
+                console.error("Error updating movie:", error);
+                alert("Failed to update movie");
+            }
+        }
+    };
 
-  if (loading) return <p>Loading movies...</p>;
+    const handleDeleteMovie = async (id: string) => {
+        try {
+            await MovieService.deleteMovie(id);
+            alert("Movie deleted successfully");
+            fetchMovies();
+        } catch (error) {
+            console.error("Error deleting movie:", error);
+            alert("Failed to delete movie");
+        }
+    };
 
-  return (
-    <div>
-      <h1>Movies</h1>
+    const handleSearchById = async () => {
+        try {
+            const movie = await MovieService.getMovieById(searchId);
+            setMovies([movie]);
+        } catch (error) {
+            console.error("Error searching movie by ID:", error);
+            alert("Failed to find movie by ID");
+        }
+    };
 
-      {/* Add/Edit Movie */}
-      <div>
-        <h2>{editMode ? 'Edit Movie' : 'Add Movie'}</h2>
-        <input
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <input
-          placeholder="Year"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-        />
-        <button onClick={editMode ? handleEditMovie : handleAddMovie}>
-          {editMode ? 'Update Movie' : 'Add Movie'}
-        </button>
-        {editMode && (
-          <button onClick={() => { setEditMode(false); setEditMovieId(null); setTitle(''); setYear(''); }}>
-            Cancel Edit
-          </button>
-        )}
-      </div>
+    const handleFilterByYear = async () => {
+        try {
+            const movies = await MovieService.getAllMovies(searchYear);
+            setMovies(movies);
+        } catch (error) {
+            console.error("Error filtering movies by year:", error);
+            alert("Failed to filter movies");
+        }
+    };
 
-      {/* Filter by Year */}
-      <div>
-        <h2>Filter Movies by Year</h2>
-        <input
-          placeholder="Year"
-          value={searchYear}
-          onChange={(e) => setSearchYear(e.target.value)}
-        />
-        <button onClick={handleFilterByYear}>Filter</button>
-      </div>
+    return (
+        <div className="container">
+            <h1 className="header">Movies</h1>
 
-      {/* Search by ID */}
-      <div>
-        <h2>Search Movie by ID</h2>
-        <input
-          placeholder="Movie ID"
-          value={searchId}
-          onChange={(e) => setSearchId(e.target.value)}
-        />
-        <button onClick={handleSearchById}>Search</button>
-      </div>
+            <div className="content">
+                {/* Left Column - Operations */}
+                <div className="operations">
+                    <h2 className="subHeader">
+                        {editMode ? "Edit Movie" : "Add Movie"}
+                    </h2>
+                    <input
+                        className="input"
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <input
+                        className="input"
+                        placeholder="Year"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                    />
+                    <button
+                        className="button"
+                        onClick={editMode ? handleEditMovie : handleAddMovie}
+                    >
+                        {editMode ? "Update Movie" : "Add Movie"}
+                    </button>
+                    {editMode && (
+                        <button
+                            className="button cancelButton"
+                            onClick={() => {
+                                setEditMode(false);
+                                setEditMovieId(null);
+                                setTitle("");
+                                setYear("");
+                            }}
+                        >
+                            Cancel Edit
+                        </button>
+                    )}
 
-      {/* Movies List */}
-      <div>
-        <h2>All Movies</h2>
-        <ul>
-          {movies.map((movie) => (
-            <li key={movie.id}>
-              {movie.title} ({movie.year})
-              <button onClick={() => {
-                setEditMode(true);
-                setEditMovieId(movie.id);
-                setTitle(movie.title);
-                setYear(movie.year);
-              }}>Edit</button>
-              <button onClick={() => handleDeleteMovie(movie.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
+                    <h2 className="subHeader">Filter Movies by Year</h2>
+                    <input
+                        className="input"
+                        placeholder="Year"
+                        value={searchYear}
+                        onChange={(e) => setSearchYear(e.target.value)}
+                    />
+                    <button className="button" onClick={handleFilterByYear}>
+                        Filter
+                    </button>
+
+                    <h2 className="subHeader">Search Movie by ID</h2>
+                    <input
+                        className="input"
+                        placeholder="Movie ID"
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                    />
+                    <button className="button" onClick={handleSearchById}>
+                        Search
+                    </button>
+                </div>
+
+                {/* Right Column - Movie List */}
+                <div className="movieList">
+                    <h2 className="subHeader">All Movies</h2>
+                    <button className="button" onClick={fetchMovies}>
+                        Get All Movies
+                    </button>
+                    <ul>
+                        {movies.map((movie) => (
+                            <li key={movie.id} className="listItem">
+                                {movie.id} - {movie.title} ({movie.year})
+                                <div>
+                                    <button
+                                        className="actionButton"
+                                        onClick={() => {
+                                            setEditMode(true);
+                                            setEditMovieId(movie.id);
+                                            setTitle(movie.title);
+                                            setYear(movie.year);
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="actionButton"
+                                        onClick={() =>
+                                            handleDeleteMovie(movie.id)
+                                        }
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default MoviePage;
