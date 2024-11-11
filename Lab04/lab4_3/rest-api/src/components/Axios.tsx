@@ -16,7 +16,7 @@ function Axios() {
     const [body, setBody] = useState("");
     const [posts, setPosts] = useState<PostInfo[]>([]);
 
-    // GET with Axios
+    // GET 
     useEffect(() => {
         const fetchPost = async () => {
             try {
@@ -30,7 +30,7 @@ function Axios() {
         fetchPost();
     }, []);
 
-    // Delete with Axios
+    // DELETE
     const deletePost = async (id: number) => {
         await client.delete(`${id}`);
         setPosts(
@@ -40,7 +40,7 @@ function Axios() {
         );
     };
 
-    // Post with Axios
+    // POST
     const addPosts = async (title: string, body: string) => {
         let response = await client.post("", {
             title: title,

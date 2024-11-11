@@ -24,7 +24,7 @@ services:
       - "8080:8080"
     restart: on-failure
     volumes:
-      - .m2:/root/.m2    # Persist Maven dependencies
+      - .m2:/root/.m2    # persist Maven dependencies
     # networks:
     #   - app_network
 

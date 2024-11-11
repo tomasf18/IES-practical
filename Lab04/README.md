@@ -2,9 +2,9 @@
 
 # Lab 4: Objective of this lab
 
-    - Develop web projects with Spring Boot.
-    - Create and persist entities into a relational database using Spring Data.
-    - Deploy Spring Boot application in Docker.
+- Develop web projects with Spring Boot.
+- Create and persist entities into a relational database using Spring Data.
+- Deploy Spring Boot application in Docker.
 
 ## Table of Contents
 
@@ -36,6 +36,10 @@
         -   [Performing a GET Request](#performing-a-get-request)
         -   [Performing a DELETE Request](#performing-a-delete-request)
         -   [Performing a POST Request](#performing-a-post-request)
+5. [Wrapping-up and integrating concepts](#wrapping-up-and-integrating-concepts)
+    -   [Create a Frontend Dockerfile](#create-a-dockerfile)
+    -   [Create the Compose of the several app services](#create-the-compose-with-the-several-app-services)
+    -   [Run the Docker Compose](#run-the-docker-compose)
 
 ## ReactJS + Vite
 
@@ -210,10 +214,7 @@ function MyButton() {
 
 ### Sharing data between components
 
-![](images/img1.webp)
-
 -   Initially, each MyButton’s count state is 0
-    ![](images/img2.webp)
 -   The first MyButton updates its count to 1
 -   Often you’ll need components to share data and always **update together**.
 -   To make both `MyButton` components display the same count and **update together**, you need to **move the state from the individual buttons “upwards” to the closest component containing all of them**.
@@ -1224,3 +1225,83 @@ const addPosts = async (title: string, body: string) => {
 -   `response.data`: Contains the newly created post data as returned by the API.
 -   `setPosts((posts) => [response.data, ...posts])`: Adds the new post to the beginning of the `posts` array in the state.
 -   **Again, using `await` makes sure the new post is only added to the list after the server has processed the request.**
+
+
+## Wrapping-up and integrating concepts
+
+- Frontend
+    - **Interface** (forms): verification & validation
+    - API consumer: **Axios**, Fetch API functions for communication with the backend endpoints
+- Backend
+    - Controllers: **CRUD** operations
+    - Services: **business logic**
+    - DAO/Repositories: **database operations & persistence**
+    - MySQL: **database** for storing data
+
+---
+
+### Create a Frontend Dockerfile
+
+```Dockerfile
+FROM node:20.18.0
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host"]
+```
+
+### Create the Compose with the several app services
+
+- Reuse the Dockerfiles created in the previous labs
+
+```yml
+services:
+  mysqldb:
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: secret2
+      MYSQL_DATABASE: demo
+      MYSQL_USER: demo
+      MYSQL_PASSWORD: secret2
+    ports:
+      - "33060:3306"
+    restart: on-failure
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app_container:
+    depends_on:
+      - mysqldb
+    build: 
+      context: ../Lab03/lab3_3
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - .m2:/root/.m2 
+
+  react_app:
+    depends_on:
+      - app_container
+    build:
+      context: ./lab4_4/api-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:3000"
+    restart: on-failure
+
+volumes:
+  mysql_data:
+```
+
+### Run the Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+And now you can access the application at `http://172.26.0.4:5173`.
