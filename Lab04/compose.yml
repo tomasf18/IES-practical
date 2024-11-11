@@ -1,0 +1,45 @@
+services:
+  mysqldb:
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: secret2
+      MYSQL_DATABASE: demo
+      MYSQL_USER: demo
+      MYSQL_PASSWORD: secret2
+    ports:
+      - "33060:3306"
+    restart: on-failure
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # networks:
+    #   - app_network
+
+  app_container:
+    depends_on:
+      - mysqldb
+    build: 
+      context: ../Lab03/lab3_3
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - .m2:/root/.m2    # Persist Maven dependencies
+    # networks:
+    #   - app_network
+
+  react_app:
+    depends_on:
+      - app_container
+    build:
+      context: ./lab4_4/api-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: on-failure
+
+# networks:
+#   app_network:
+
+volumes:
+  mysql_data:
