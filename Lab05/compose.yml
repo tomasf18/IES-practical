@@ -5,82 +5,88 @@ services:
   kafdrop:
     image: obsidiandynamics/kafdrop:4.0.2
     ports:
-      - "9009:9000"
+      - "${KAFDROP_LOCAL_PORT}:${KAFDROP_CONTAINER_PORT}"
     environment:
-      KAFKA_BROKERCONNECT: "kafka:9092" # Kafka Broker Network Addresses (host:port,host:port)
-      SERVER_SERVLET_CONTEXTPATH: "/"
+      KAFKA_BROKERCONNECT: "kafka:${KAFKA_BROKER_PORT}"
+      SERVER_SERVLET_CONTEXTPATH: "${KAFDROP_CONTEXT_PATH}"
     networks:
-      - app_network
+      - ${NETWORK_NAME}
 
-  lab5_mysqldb:
+  mysqldb:
     image: mysql/mysql-server:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: secret2
-      MYSQL_DATABASE: demo
-      MYSQL_USER: demo
-      MYSQL_PASSWORD: secret2
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "33060:3306"
+      - "${DATABASE_LOCAL_PORT}:${DATABASE_CONTAINER_PORT}"
     restart: on-failure
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - app_network
+      - ${NETWORK_NAME}
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CONTAINER_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
     ports:
-      - 22181:2181
+      - "${ZOOKEEPER_LOCAL_PORT}:${ZOOKEEPER_CONTAINER_PORT}"
     networks:
-      - app_network
+      - ${NETWORK_NAME}
   
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - "${KAFKA_LOCAL_PORT}:${KAFKA_CONTAINER_PORT}"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_RETENTION_MS: 10000
-      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 5000
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:${ZOOKEEPER_CONTAINER_PORT}"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:${KAFKA_BROKER_PORT},PLAINTEXT_HOST://${KAFKA_IP}:${KAFKA_CONTAINER_PORT}"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR}
+      KAFKA_LOG_RETENTION_MS: ${KAFKA_RETENTION_MS}
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: ${KAFKA_RETENTION_CHECK_INTERVAL_MS}
     networks:
-      - app_network
+      - ${NETWORK_NAME}
 
-  lab_5_app_container:
+  app_container:
     depends_on:
-      - lab5_mysqldb
+      - mysqldb
       - kafka
     build: 
-      context: ../Lab03/lab3_3
+      context: ${BACKEND_CONTEXT_PATH}
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "${BACKEND_LOCAL_PORT}:${BACKEND_CONTAINER_PORT}"
+    environment:
+      FRONTEND_IP: ${FRONTEND_IP}
+      FRONTEND_PORT: ${FRONTEND_CONTAINER_PORT}
     restart: on-failure
     volumes:
       - .m2:/root/.m2    # persist Maven dependencies
     networks:
-      - app_network
+      - ${NETWORK_NAME}
 
   react_app:
     depends_on:
-      - lab_5_app_container
+      - app_container
     build:
-      context: ../Lab04/lab4_4/api-frontend
+      context: ${FRONTEND_CONTEXT_PATH}
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "${FRONTEND_LOCAL_PORT}:${FRONTEND_CONTAINER_PORT}"
+    environment:
+      BACKEND_IP: ${BACKEND_IP}
+      BACKEND_PORT: ${BACKEND_CONTAINER_PORT}
     restart: on-failure
     networks:
-      - app_network
+      - ${NETWORK_NAME}
 
 networks:
   app_network:

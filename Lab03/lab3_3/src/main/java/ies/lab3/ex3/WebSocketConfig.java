@@ -1,5 +1,6 @@
 package ies.lab3.ex3;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -9,6 +10,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Value("${FRONTEND_IP}")
+    private String frontendIp;
+
+    @Value("${FRONTEND_PORT}")
+    private String frontendPort;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -26,6 +33,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Clients connect to WebSocket at "/backend-ws"
-        registry.addEndpoint("/backend-ws").setAllowedOrigins("http://localhost:5173");
+        registry.addEndpoint("/backend-ws").setAllowedOrigins("http://" + frontendIp + ":" + frontendPort);
     }
 }
