@@ -1,4 +1,5 @@
 import AxiosInstance from './AxiosInstance';
+import * as StompJs from "@stomp/stompjs";
 
 interface Quote {
     id: string;
@@ -11,7 +12,62 @@ interface QuoteRequest {
     movieId: string;
 }
 
+let stompClient: StompJs.Client | null = null; 
+
 export const QuoteService = {
+
+    connectWebSocket: async (setQuotes: React.Dispatch<React.SetStateAction<Quote[]>>) => {
+
+        if (stompClient && stompClient.active) {
+            console.log("WebSocket already connected");
+            return; 
+        }
+
+        stompClient = new StompJs.Client({
+            brokerURL: "ws://localhost:8080/backend-ws",    
+            debug: (str) => console.log(str),               
+            reconnectDelay: 5000,                           
+            heartbeatIncoming: 4000,                        
+        });
+
+        
+        stompClient.onConnect = (frame) => {
+            console.log("Connected: " + frame);
+
+            stompClient?.subscribe("/topic/quotes", (message) => {
+                const newQuote = JSON.parse(message.body);
+                console.log("Received new quote: ", newQuote);
+
+                setQuotes((prevQuotes) => {
+                    const updatedQuotes = [...prevQuotes, newQuote];
+                    return updatedQuotes.slice(-5);        
+                });
+            });
+        };
+
+        // Handle WebSocket errors
+        stompClient.onWebSocketError = (error) => {
+            console.error("WebSocket error: ", error);
+        };
+
+        // Handle STOMP protocol errors
+        stompClient.onStompError = (frame) => {
+            console.error("Broker reported error: " + frame.headers["message"]);
+            console.error("Additional details: " + frame.body);
+        };
+
+        // Activate the client
+        stompClient.activate();
+
+        // Cleanup on component unmount
+        return () => {
+            if (stompClient && stompClient.active) {
+                stompClient.deactivate();
+                console.log("WebSocket connection closed");
+            }
+        };
+    },
+
     createQuote: async (quoteRequest: QuoteRequest) => {
         try {
             const response = await AxiosInstance.post<Quote>('/quotes', quoteRequest);

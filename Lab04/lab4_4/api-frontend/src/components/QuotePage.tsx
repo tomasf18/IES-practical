@@ -18,12 +18,13 @@ function QuotePage() {
 
     useEffect(() => {
         fetchQuotes();
+        QuoteService.connectWebSocket(setQuotes);
     }, []);
 
     const fetchQuotes = async () => {
         try {
             const quotes = await QuoteService.getAllQuotes();
-            setQuotes(quotes);
+            setQuotes(quotes.slice(-5));
         } catch (error) {
             console.error("Error fetching quotes:", error);
         }

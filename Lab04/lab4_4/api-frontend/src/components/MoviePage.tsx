@@ -17,13 +17,16 @@ function MoviePage() {
     const [editMovieId, setEditMovieId] = useState<string | null>(null);
 
     useEffect(() => {
+        // Create the STOMP client
+        // sleep 1000ms to wait for the backend to start
         fetchMovies();
+        MovieService.connectWebSocket(setMovies);
     }, []);
 
     const fetchMovies = async () => {
         try {
             const movies = await MovieService.getAllMovies();
-            setMovies(movies);
+            setMovies(movies.slice(-5));
         } catch (error) {
             console.error("Error fetching movies:", error);
         }

@@ -1,6 +1,32 @@
 version: '3'
 name: lab05
 services:
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:4.0.2
+    ports:
+      - "9009:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092" # Kafka Broker Network Addresses (host:port,host:port)
+      SERVER_SERVLET_CONTEXTPATH: "/"
+    networks:
+      - app_network
+
+  lab5_mysqldb:
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: secret2
+      MYSQL_DATABASE: demo
+      MYSQL_USER: demo
+      MYSQL_PASSWORD: secret2
+    ports:
+      - "33060:3306"
+    restart: on-failure
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
@@ -8,6 +34,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:2181
+    networks:
+      - app_network
   
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -24,12 +52,38 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_RETENTION_MS: 10000
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 5000
+    networks:
+      - app_network
 
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop:4.0.2
+  lab_5_app_container:
+    depends_on:
+      - lab5_mysqldb
+      - kafka
+    build: 
+      context: ../Lab03/lab3_3
+      dockerfile: Dockerfile
     ports:
-      - "9009:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:9092" # Kafka Broker Network Addresses (host:port,host:port)
-      SERVER_SERVLET_CONTEXTPATH: "/"
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - .m2:/root/.m2    # persist Maven dependencies
+    networks:
+      - app_network
+
+  react_app:
+    depends_on:
+      - lab_5_app_container
+    build:
+      context: ../Lab04/lab4_4/api-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    restart: on-failure
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
+volumes:
+  mysql_data:

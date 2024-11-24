@@ -4,6 +4,7 @@ import jakarta.persistence.Table;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,7 +29,7 @@ public class Movie {
     @Column(nullable = false)
     private String year;
 
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quote> quotes;
 
     // Atandard constructors / setters / getters / toString
