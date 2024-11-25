@@ -2,12 +2,12 @@
 
 # Lab 4: Objective of this lab
 
-- Develop web projects with Spring Boot.
-- Create and persist entities into a relational database using Spring Data.
-- Deploy Spring Boot application in Docker.
+ - Deploy Apache Kafka in Docker.  
+ - Create an application to produce and consume messages with Apache Kafka and Spring Boot.
 
 ## Table of Contents
 
+0. [How to run the project](#how-to-run-the-project)
 1. [Configure Apache Kafka with Docker](#configure-apache-kafka-with-docker)
     - [Apache Kafka](#apache-kafka)
     - [Kafdrop: Kafka Management Tool](#kafdrop-kafka-management-tool)
@@ -34,6 +34,25 @@
     - [Spring Boot Backend](#spring-boot-backend)
     - [React Frontend](#react-frontend)
     - [Docker Deployment](#docker-deployment)
+5. [References](#references)
+
+---
+
+## How to run the project
+
+1. **Start the services**:
+```bash
+docker compose up --build
+```
+
+2. **Wait for the services to start**:
+   - Access the Kafdrop UI at [http://localhost:9009](http://localhost:9009).
+   - Access the React frontend at [http://localhost:5173](http://localhost:5173).
+
+3. **Run the Python producer (at `./lab5_4/kafka_quotes/kafka_quotes`)**:
+```bash
+poetry run python quotes_producer.py
+```
 
 ---
 
@@ -744,7 +763,6 @@ stompClient?.subscribe("/topic/movies", (message) => {
 ### **Docker Deployment**
 
 ```yaml
-version: '3'
 name: lab05
 services:
 
@@ -815,7 +833,7 @@ services:
       FRONTEND_PORT: ${FRONTEND_CONTAINER_PORT}
     restart: on-failure
     volumes:
-      - .m2:/root/.m2    
+      - .m2:/root/.m2    # persist Maven dependencies
     networks:
       - ${NETWORK_NAME}
 
@@ -834,12 +852,29 @@ services:
     networks:
       - ${NETWORK_NAME}
 
+  # The generator will be a third-party service that will produce messages to the Kafka topic (run separately)
+  # generator:
+  #   depends_on:
+  #     - kafka
+  #     - react_app
+  #   build:
+  #     context: ${GENERATOR_CONTEXT_PATH}
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     BROKER_IP: kafka
+  #     BROKER_PORT: ${KAFKA_CONTAINER_PORT}
+  #     TOPIC_NAME: ${KAFKA_TOPIC}
+  #   command: >
+  #     python /app/wait_for_kafka.py kafka ${KAFKA_CONTAINER_PORT} && 
+  #     poetry run python kafka_quotes/quotes_producer.py
+  #   networks:
+  #     - ${NETWORK_NAME}
+
 networks:
   app_network:
 
 volumes:
   mysql_data:
-
 ```
 
 ---

@@ -1,7 +1,11 @@
+import os
 import sys
 import types
 import random
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Mock the 'kafka.vendor.six.moves' module to bypass missing dependency issues
 m = types.ModuleType('kafka.vendor.six.moves', 'Mock module')
@@ -12,8 +16,13 @@ from kafka import KafkaProducer
 import json
 
 # Kafka Configuration
-bootstrap_servers = 'localhost:29092'  # Kafka broker address
-topic_name = 'quotes'  
+broker_ip = os.getenv('BROKER_IP') or 'localhost'
+broker_port = os.getenv('BROKER_PORT') or '29092'
+topic_name = os.getenv('TOPIC_NAME') or 'quotes'
+bootstrap_servers = f'{broker_ip}:{broker_port}' 
+
+print(f"Broker IP: {bootstrap_servers}")
+print (f"Topic Name: {topic_name}")
 
 # Create a Kafka producer instance
 producer = KafkaProducer(
@@ -49,7 +58,6 @@ try:
         generate_and_send_quote(i)
         i += 1
         time.sleep(random.randint(5, 10))
-
 except KeyboardInterrupt:
     print("Process interrupted. Closing producer.")
 
