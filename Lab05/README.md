@@ -8,6 +8,32 @@
 
 ## Table of Contents
 
+1. [Configure Apache Kafka with Docker](#configure-apache-kafka-with-docker)
+    - [Apache Kafka](#apache-kafka)
+    - [Kafdrop: Kafka Management Tool](#kafdrop-kafka-management-tool)
+    - [Where to find the KafDrop UI, how to creare a topic and how to produce and consume messages](#where-to-find-the-kafdrop-ui-how-to-creare-a-topic-and-how-to-produce-and-consume-messages)
+    - [Answer to ex. 1_f](#answer-to-ex-1_f)
+2. [Create a producer and consumer](#create-a-producer-and-consumer)
+    - [Setting Up the Project with Poetry](#setting-up-the-project-with-poetry)
+    - [Python Version Issue and the Workaround](#python-version-issue-and-the-workaround)
+    - [Kafka Producer](#kafka-producer)
+    - [Kafka Consumer](#kafka-consumer)
+    - [Running the Applications](#running-the-applications)
+    - [Answers to ex. 2_c and 2_d](#answers-to-ex-2_c-and-2_d)
+3. [Create a consumer (& producer) in Java integrated with Spring Boot](#create-a-consumer--producer-in-java-integrated-with-spring-boot)
+    - [Setting Up the Spring Boot Project](#setting-up-the-spring-boot-project)
+    - [Configuration: `application.properties`](#configuration-applicationproperties)
+    - [Message Model: `Message` Class](#message-model-message-class)
+    - [Kafka Consumer](#kafka-consumer-1)
+    - [Kafka Producer](#kafka-producer-1)
+    - [Main Application](#main-application)
+    - [Key Takeaways](#key-takeaways)
+4. [Wrapping-up and integrating concepts](#wrapping-up-and-integrating-concepts)
+    - [Creating the new `quotes` topic](#creating-the-new-quotes-topic)
+    - [Python Producer for Kafka (Data Generation)](#python-producer-for-kafka-data-generation)
+    - [Spring Boot Backend](#spring-boot-backend)
+    - [React Frontend](#react-frontend)
+    - [Docker Deployment](#docker-deployment)
 
 ---
 
@@ -535,13 +561,292 @@ Send new messages using the Spring Boot producer and verify that Python consumes
 - **Serialization/Deserialization**: Proper JSON serializers and deserializers are crucial for cross-language message handling.
 - **Spring Kafka** simplifies consumer/producer logic while providing robust configurations for scalability and reliability.
 
+---
+
+## Wrapping-up and integrating concepts
+
+In this exercise, I integrated what was missing for a full combination of **Kafka messaging**, **Spring Boot backend services**, **Relational DB**, **WebSocket communication**, and **React frontend** components to create a fully functional **movie/quote** system.
+
+### Creating the new `quotes` topic
+
+To create the new `quotes` topic, I used the following command:
+
+```bash
+docker exec lab05-kafka-1 kafka-topics --create --topic quotes --partitions 1 --replication-factor 1 --bootstrap-server kafka:9092
+```
+
+### **Python Producer for Kafka (Data Generation)**
+
+#### Purpose: (`./lab5_4/kafka_quotes/kafka_quotes/quotes_producer.py`)
+Created a Python script to **generate random quotes associated with movie data** every 5–10 seconds and send them to a Kafka topic named **`quotes`**.
+
+#### Key Features:
+- **Random Quote Generation**:
+  - A predefined list of quotes is randomly selected for each message.
+  - Each message contains a movie ID, title, release year, and a quote.
+
+- **Kafka Producer**:
+  - Configured with **`localhost:29092`** (in environment variables) as the Kafka broker.
+  - Uses `json.dumps` to serialize the message in JSON format before sending.
+
+- **Message Sending**:
+  - Each message is sent to the Kafka topic **`quotes`**.
+  - The producer ensures the system constantly receives new data for processing.
+
+### **Spring Boot Backend**
+
+The Spring Boot backend acts as the core processing unit, **consuming Kafka messages**, **storing data in a database**, and **relaying updates to the React frontend via `WebSocket`**.
+
+#### Application Properties
+
+In the `application.properties`, among other configurations, I configured the **Kafka consumer** settings to `deserialize` JSON messages into `Message` objects:
+
+```properties
+spring.kafka.bootstrap-servers: kafka:9092
+spring.kafka.consumer.group-id=consumers_1
+spring.kafka.consumer.auto-offset-reset: earliest
+spring.kafka.consumer.key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+spring.kafka.consumer.properties.spring.json.trusted.packages=*
+spring.kafka.consumer.properties[spring.json.value.default.type]=ies.lab3.ex3.entity.Message
+```
+
+#### Kafka Consumer Service
+
+The **`KafkaConsumerService`** listens to the Kafka topic **`quotes`**.
+
+- **Message Processing**:
+  - Each Kafka message (JSON) is **deserialized** into a `Message` object using **Spring Kafka's JsonDeserializer**.
+
+```java
+public class Message {
+    // message = {
+    //     "movieId": movie["id"],
+    //     "movieTitle": movie["title"],
+    //     "movieYear": movie["year"],
+    //     "quote": quote
+    // }
+
+    private int movieId;
+    private String movieTitle;
+    private String movieYear;
+    private String quote;
+
+    public Message() {
+    }
+
+    public Message(int movieId, String movieTitle, String movieYear, String quote) {
+        this.movieId = movieId;
+        this.movieTitle = movieTitle;
+        this.movieYear = movieYear;
+        this.quote = quote;
+    }
+    
+    ...
+```
+  - A `Movie` object is created or updated in the database.
+  - A corresponding `Quote` is created and saved in the database.
+
+- **Integration with WebSocket**:
+  - The processed movie and quote are sent to WebSocket subscribers using the `MessageController` class.
+
+```java
+@KafkaListener(topics = "quotes", groupId = "consumers_1")
+public void listen(Message message) {
+    Movie movie = new Movie(message.getMovieTitle(), message.getMovieYear());
+    movieService.createMovie(movie);
+
+    Quote quote = new Quote(message.getQuote(), movie);
+    quoteService.createQuote(quote);
+
+    webSocketController.sendMovie(movie);
+    webSocketController.sendQuote(quote);
+}
+```
+
+#### WebSocket Configuration
+
+The **`WebSocketConfig`** class enables WebSocket communication between the backend and the frontend.
+
+- **Endpoints**:
+  - **`/backend-ws`**: WebSocket endpoint **clients** (React frontend) **use to connect**.
+
+```java
+@Override
+public void registerStompEndpoints(StompEndpointRegistry registry) {
+    // Clients connect to WebSocket at "/backend-ws"
+    registry.addEndpoint("/backend-ws").setAllowedOrigins("http://" + frontendIp + ":" + frontendPort);
+}
+```
+
+  - **`/topic/movies`** and **`/topic/quotes`**: **Subscriptions** for receiving updates about movies and quotes.
+
+- **Broker Setup**:
+  - Uses Spring's SimpleBroker to route messages to the appropriate topics.
+
+```java
+@Override
+public void configureMessageBroker(MessageBrokerRegistry config) {
+    config.enableSimpleBroker("/topic"); // Broadcast to "/topic/movies" and "/topic/quotes"
+}
+```
+
+#### Message Controller
+
+The **`MessageController`** class uses Spring's `SimpMessagingTemplate` to send real-time updates to WebSocket clients.
+
+- **Broadcasting Updates**:
+  - When a new movie or quote is processed, it is sent to all WebSocket clients subscribed to the respective topics.
+
+```java
+public void sendMovie(Movie movie) {
+    messagingTemplate.convertAndSend("/topic/movies", movie);
+}
+
+public void sendQuote(Quote quote) {
+    messagingTemplate.convertAndSend("/topic/quotes", quote);
+}
+```
+
+### **React Frontend**
+
+The React frontend provides a user interface to display the latest movies and quotes.
+
+#### Real-Time Updates with WebSocket -> API Consumer Services
+
+- **WebSocket Client**:
+  - Uses the `@stomp/stompjs` library to connect to the backend WebSocket endpoint (**`ws://localhost:8080/backend-ws`**).
+  - Subscribes to **`/topic/movies`** and **`/topic/quotes`** to receive real-time updates.
+
+- **React State Management**:
+  - Updates the state with the **latest 5 movies/quotes** as they arrive.
+  - **This ensures the frontend reflects the most recent data without requiring a manual refresh**.
+
+```javascript
+stompClient?.subscribe("/topic/movies", (message) => {
+    const newMovie = JSON.parse(message.body);
+    setMovies((prevMovies) => {
+        const updatedMovies = [...prevMovies, newMovie];
+        return updatedMovies.slice(-5); // Keep only the last 5 movies
+    });
+});
+```
+
+#### Movie and Quote Pages
+
+- **Display Latest Data**:
+  - The **`MoviePage`** and **`QuotePage`** components fetch existing movies/quotes and subscribe to WebSocket updates.
+
+- **Dynamic UI Updates**:
+  - The pages automatically update to show the latest 5 movies and quotes, leveraging WebSocket real-time communication.
 
 
+### **Docker Deployment**
 
+```yaml
+version: '3'
+name: lab05
+services:
 
+  kafdrop:
+    image: obsidiandynamics/kafdrop:4.0.2
+    ports:
+      - "${KAFDROP_LOCAL_PORT}:${KAFDROP_CONTAINER_PORT}"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:${KAFKA_BROKER_PORT}"
+      SERVER_SERVLET_CONTEXTPATH: "${KAFDROP_CONTEXT_PATH}"
+    networks:
+      - ${NETWORK_NAME}
 
-[Kafka Documentation](https://kafka.apache.org/documentation/)
-[Poetry](https://python-poetry.org/)
+  mysqldb:
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${DATABASE_LOCAL_PORT}:${DATABASE_CONTAINER_PORT}"
+    restart: on-failure
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ${NETWORK_NAME}
 
-[How to implement a Serializer in Spring Boot to deserialize the message produced](https://howtodoinjava.com/kafka/spring-boot-jsonserializer-example/)
-[KafkaTemplate](https://docs.spring.io/spring-kafka/reference/kafka/sending-messages.html)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CONTAINER_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+    ports:
+      - "${ZOOKEEPER_LOCAL_PORT}:${ZOOKEEPER_CONTAINER_PORT}"
+    networks:
+      - ${NETWORK_NAME}
+  
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - "${KAFKA_LOCAL_PORT}:${KAFKA_CONTAINER_PORT}"
+    environment:
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:${ZOOKEEPER_CONTAINER_PORT}"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:${KAFKA_BROKER_PORT},PLAINTEXT_HOST://${KAFKA_IP}:${KAFKA_CONTAINER_PORT}"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR}
+      KAFKA_LOG_RETENTION_MS: ${KAFKA_RETENTION_MS}
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: ${KAFKA_RETENTION_CHECK_INTERVAL_MS}
+    networks:
+      - ${NETWORK_NAME}
+
+  app_container:
+    depends_on:
+      - mysqldb
+      - kafka
+    build: 
+      context: ${BACKEND_CONTEXT_PATH}
+      dockerfile: Dockerfile
+    ports:
+      - "${BACKEND_LOCAL_PORT}:${BACKEND_CONTAINER_PORT}"
+    environment:
+      FRONTEND_IP: ${FRONTEND_IP}
+      FRONTEND_PORT: ${FRONTEND_CONTAINER_PORT}
+    restart: on-failure
+    volumes:
+      - .m2:/root/.m2    
+    networks:
+      - ${NETWORK_NAME}
+
+  react_app:
+    depends_on:
+      - app_container
+    build:
+      context: ${FRONTEND_CONTEXT_PATH}
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_LOCAL_PORT}:${FRONTEND_CONTAINER_PORT}"
+    environment:
+      BACKEND_IP: ${BACKEND_IP}
+      BACKEND_PORT: ${BACKEND_CONTAINER_PORT}
+    restart: on-failure
+    networks:
+      - ${NETWORK_NAME}
+
+networks:
+  app_network:
+
+volumes:
+  mysql_data:
+
+```
+
+---
+
+## References
+
+- [Poetry](https://python-poetry.org/)
+- [Kafka Documentation](https://kafka.apache.org/documentation/)
+- [How to implement a Serializer in Spring Boot to deserialize the message produced](https://howtodoinjava.com/kafka/spring-boot-jsonserializer-example/)
+- [KafkaTemplate](https://docs.spring.io/spring-kafka/reference/kafka/sending-messages.html)
